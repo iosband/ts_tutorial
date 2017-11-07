@@ -9,6 +9,7 @@ from base.environment import Environment
 
 ##############################################################################
 
+
 class FiniteArmedBernoulliBandit(Environment):
   """Simple N-armed bandit."""
 
@@ -34,6 +35,7 @@ class FiniteArmedBernoulliBandit(Environment):
 
 
 ##############################################################################
+
 
 class DriftingFiniteArmedBernoulliBandit(FiniteArmedBernoulliBandit):
   """N-armed bandit with drift.
@@ -64,14 +66,17 @@ class DriftingFiniteArmedBernoulliBandit(FiniteArmedBernoulliBandit):
 
   def advance(self, action, reward):
     # All arms drift back to mixing distribution at rate gamma
-    self.prior_success = self.prior_success * (1 - self.gamma) + self.a0 * self.gamma
-    self.prior_failure = self.prior_failure * (1 - self.gamma) + self.b0 * self.gamma
+    self.prior_success = self.prior_success * (
+        1 - self.gamma) + self.a0 * self.gamma
+    self.prior_failure = self.prior_failure * (
+        1 - self.gamma) + self.b0 * self.gamma
 
     # Sampled arm has some learning
     self.prior_success[action] += reward
     self.prior_failure[action] += 1 - reward
 
     # Resample posterior probabilities
-    self.probs = np.array([np.random.beta(self.prior_success[a], self.prior_failure[a]) for a in range(self.n_arm)])
-
-
+    self.probs = np.array([
+        np.random.beta(self.prior_success[a], self.prior_failure[a])
+        for a in range(self.n_arm)
+    ])

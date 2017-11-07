@@ -17,6 +17,7 @@ def random_argmax(vector):
 
 ##############################################################################
 
+
 class Agent(object):
   """Base class for all bandit agents."""
 

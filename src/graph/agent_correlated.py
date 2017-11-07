@@ -1,11 +1,11 @@
-'''Agents for graph bandit problems.
+"""Agents for graph bandit problems.
 
 These agents became too large to comfortably keep in one file, so we divided
 it up into three separate sections for:
 - Independent Binomial Bridge
 - Correlated Binomial Bridge
 - Independent Binomial Bridge with Binary Reward
-'''
+"""
 
 from __future__ import division
 from __future__ import print_function
@@ -18,7 +18,6 @@ import random
 from collections import defaultdict
 from base.agent import Agent
 from graph.env_graph_bandit import CorrelatedBinomialBridge
-
 
 ###############################################################################
 # Helper functions for correlated agents
@@ -40,9 +39,9 @@ def _prepare_posterior_update_elements(observation, action, reward, num_edges, \
           a vector to be used in updating the mean vector, and a concentration
           matrix to be used when updating covariance matrix and the mean vector
   """
-# generating the local concentration matrix and log-rewards for each edge
+  # generating the local concentration matrix and log-rewards for each edge
   log_rewards = np.zeros(num_edges)
-  local_concentration = np.zeros((observation,observation))
+  local_concentration = np.zeros((observation, observation))
   first_edge_counter = 0
   for start_node in reward:
     for end_node in reward[start_node]:
@@ -56,8 +55,8 @@ def _prepare_posterior_update_elements(observation, action, reward, num_edges, \
               = sigma_tilde ** 2
           elif internal_env.is_in_lower_half(start_node, end_node) \
             == internal_env.is_in_lower_half(another_start_node, another_end_node):
-              local_concentration[first_edge_counter, secod_edge_counter] \
-                = 2 * (sigma_tilde ** 2) / 3
+            local_concentration[first_edge_counter, secod_edge_counter] \
+              = 2 * (sigma_tilde ** 2) / 3
           else:
             local_concentration[first_edge_counter, secod_edge_counter] \
                       = (sigma_tilde ** 2) / 3
@@ -72,31 +71,36 @@ def _prepare_posterior_update_elements(observation, action, reward, num_edges, \
   first_edge_counter = 0
   for start_node in reward:
     for end_node in reward[start_node]:
-        secod_edge_counter = 0
-        for another_start_node in reward:
-          for another_end_node in reward[another_start_node]:
-              concentration[edge2index[start_node][end_node] \
-                            ,edge2index[another_start_node][another_end_node]] \
-              = local_concentration_inv[first_edge_counter,secod_edge_counter]
-              secod_edge_counter += 1
-        first_edge_counter += 1
+      secod_edge_counter = 0
+      for another_start_node in reward:
+        for another_end_node in reward[another_start_node]:
+          concentration[edge2index[start_node][end_node] \
+                        ,edge2index[another_start_node][another_end_node]] \
+          = local_concentration_inv[first_edge_counter,secod_edge_counter]
+          secod_edge_counter += 1
+      first_edge_counter += 1
 
   return log_rewards, concentration
 
 
 def _update_posterior(posterior, log_rewards, concentration):
   """Updates the posterior parameters of the correlated BB problem.
+
       Input:
-          posterior - current posterior parameters in the form of (Mu, Sigma, Sigmainv)
+          posterior - current posterior parameters in the form of (Mu, Sigma,
+          Sigmainv)
           log_rewards - log of the delays observed for each traversed edge
-          concentration - a concentration matrix computed based on the new observation
+          concentration - a concentration matrix computed based on the new
+          observation
 
       Return:
-          updated parameters: Mu, Sigma, Sigmainv"""
+          updated parameters: Mu, Sigma, Sigmainv
+  """
 
   new_Sigma_inv = posterior[2] + concentration
   new_Sigma = npla.inv(new_Sigma_inv)
-  new_Mu = new_Sigma.dot(posterior[2].dot(posterior[0]) + concentration.dot(log_rewards))
+  new_Mu = new_Sigma.dot(posterior[2].dot(posterior[0]) +
+                         concentration.dot(log_rewards))
 
   return new_Mu, new_Sigma, new_Sigma_inv
 
@@ -111,12 +115,12 @@ def _find_conditional_parameters(dim, S):
   for e in range(dim):
     S11 = copy.copy(S[e][e])
     S12 = S[e][:]
-    S12 = np.delete(S12,e)
+    S12 = np.delete(S12, e)
     S21 = S[e][:]
-    S21 = np.delete(S21,e)
+    S21 = np.delete(S21, e)
     S22 = S[:][:]
-    S22 = np.delete(S22,e,0)
-    S22 = np.delete(S22,e,1)
+    S22 = np.delete(S22, e, 0)
+    S22 = np.delete(S22, e, 1)
     S22inv = npla.inv(S22)
     S12S22inv = S12.dot(S22inv)
     Sig12Sig22inv.append(S12S22inv)
@@ -127,10 +131,11 @@ def _find_conditional_parameters(dim, S):
 
 ##############################################################################
 
+
 class CorrelatedBBTS(Agent):
   """Correlated Binomial Bridge Thompson Sampling"""
 
-  def __init__(self, n_stages, mu0, sigma0, sigma_tilde, n_sweeps = 10):
+  def __init__(self, n_stages, mu0, sigma0, sigma_tilde, n_sweeps=10):
     """An agent for graph bandits.
 
     Args:
@@ -140,7 +145,7 @@ class CorrelatedBBTS(Agent):
       sigma_tilde - noise on observation
       n_sweeps - number of sweeps, used only in Gibbs sampling
     """
-    assert(n_stages % 2 == 0)
+    assert (n_stages % 2 == 0)
     self.n_stages = n_stages
     self.n_sweeps = n_sweeps
 
@@ -154,16 +159,16 @@ class CorrelatedBBTS(Agent):
     for start_node in self.internal_env.graph:
       for end_node in self.internal_env.graph[start_node]:
         self.edge2index[start_node][end_node] = edge_counter
-        self.index2edge[edge_counter] = (start_node,end_node)
+        self.index2edge[edge_counter] = (start_node, end_node)
         edge_counter += 1
 
     # saving the number of total edges
     self.num_edges = edge_counter
 
     # prior parameters
-    self.Mu0 = np.array([mu0]*self.num_edges)
-    self.Sigma0 = np.diag([sigma0**2]*self.num_edges)
-    self.Sigma0inv = np.diag([(1/sigma0)**2]*self.num_edges)
+    self.Mu0 = np.array([mu0] * self.num_edges)
+    self.Sigma0 = np.diag([sigma0**2] * self.num_edges)
+    self.Sigma0inv = np.diag([(1 / sigma0)**2] * self.num_edges)
     self.sigma_tilde = sigma_tilde
 
     # posterior distribution is saved as a triple containing the mean vector,
@@ -219,7 +224,7 @@ class CorrelatedBBTS(Agent):
       action - path chosen by the agent (not used)
       reward - dict of dict reward[start_node][end_node] = stochastic_time
     """
-    assert(observation == self.n_stages)
+    assert (observation == self.n_stages)
 
     log_rewards, concentration = _prepare_posterior_update_elements(observation,\
             action, reward, self.num_edges, self.edge2index, self.sigma_tilde, \
@@ -241,6 +246,7 @@ class CorrelatedBBTS(Agent):
 
 ##############################################################################
 
+
 class GibbsCorrelatedBB(CorrelatedBBTS):
   """Correlated Binomial Bridge Gibbs sampling method"""
 
@@ -261,8 +267,10 @@ class GibbsCorrelatedBB(CorrelatedBBTS):
       for e in range(self.num_edges):
         others_values = np.delete(flattened_sample[:], e)
         others_mean = np.delete(self.posterior[0][:], e)
-        our_cond_mean = self.posterior[0][e] + multiplier[e].dot(others_values-others_mean)
-        flattened_sample[e] = our_cond_mean + np.sqrt(cond_var[e])*np.random.randn()
+        our_cond_mean = self.posterior[0][e] + multiplier[e].dot(
+            others_values - others_mean)
+        flattened_sample[
+            e] = our_cond_mean + np.sqrt(cond_var[e]) * np.random.randn()
 
     edge_length = copy.deepcopy(self.internal_env.graph)
 
@@ -284,6 +292,7 @@ class GibbsCorrelatedBB(CorrelatedBBTS):
 
 ##############################################################################
 
+
 class BootstrapCorrelatedBB(CorrelatedBBTS):
   """Correlated Binomial Bridge Bootstrap method"""
 
@@ -299,7 +308,8 @@ class BootstrapCorrelatedBB(CorrelatedBBTS):
 
     # resampling the history and updating the parameters
     if self.history_size > 0:
-      random_indices = np.random.randint(0, self.history_size, self.history_size)
+      random_indices = np.random.randint(0, self.history_size,
+                                         self.history_size)
       for ind in random_indices:
         Mu, Sigma, Sigmainv = _update_posterior((Mu,Sigma,Sigmainv), \
            self.log_reward_history[ind], self.concentration_history[ind])
@@ -324,7 +334,7 @@ class BootstrapCorrelatedBB(CorrelatedBBTS):
       action - path chosen by the agent (not used)
       reward - dict of dict reward[start_node][end_node] = stochastic_time
     """
-    assert(observation == self.n_stages)
+    assert (observation == self.n_stages)
 
     log_rewards, concentration = _prepare_posterior_update_elements(observation,\
             action, reward, self.num_edges, self.edge2index, self.sigma_tilde, \
@@ -342,4 +352,3 @@ class BootstrapCorrelatedBB(CorrelatedBBTS):
     path = self.internal_env.get_shortest_path()
 
     return path
-

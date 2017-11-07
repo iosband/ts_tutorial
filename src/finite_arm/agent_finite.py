@@ -1,6 +1,6 @@
 """Finite bandit agents."""
 
-
+from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
@@ -10,6 +10,7 @@ from base.agent import Agent
 from base.agent import random_argmax
 
 ##############################################################################
+
 
 class FiniteBernoulliBanditEpsilonGreedy(Agent):
   """Simple agent made for finite armed bandit problems."""
@@ -55,6 +56,7 @@ class FiniteBernoulliBanditEpsilonGreedy(Agent):
 
 ##############################################################################
 
+
 class FiniteBernoulliBanditTS(FiniteBernoulliBanditEpsilonGreedy):
   """Thompson sampling on finite armed bandit."""
 
@@ -66,6 +68,37 @@ class FiniteBernoulliBanditTS(FiniteBernoulliBanditEpsilonGreedy):
 
 
 ##############################################################################
+
+
+class FiniteBernoulliBanditBootstrap(FiniteBernoulliBanditTS):
+  """Bootstrapped Thompson sampling on finite armed bandit."""
+
+  def get_posterior_sample(self):
+    """Use bootstrap resampling instead of posterior sample."""
+    total_tries = self.prior_success + self.prior_failure
+    prob_success = self.prior_success / total_tries
+    boot_sample = np.random.binomial(total_tries, prob_success) / total_tries
+    return boot_sample
+
+##############################################################################
+
+
+class FiniteBernoulliBanditLaplace(FiniteBernoulliBanditTS):
+  """Laplace Thompson sampling on finite armed bandit."""
+
+  def get_posterior_sample(self):
+    """Gaussian approximation to posterior density (match moments)."""
+    (a, b) = (self.prior_success + 1e-6 - 1, self.prior_failure + 1e-6 - 1)
+    # The modes are not well defined unless alpha, beta > 1
+    assert np.all(a > 0)
+    assert np.all(b > 0)
+    mode = a / (a + b)
+    hessian = a / mode + b / (1 - mode)
+    laplace_sample = mode + np.sqrt(1 / hessian) * np.random.randn(self.n_arm)
+    return laplace_sample
+
+##############################################################################
+
 
 class DriftingFiniteBernoulliBanditTS(FiniteBernoulliBanditTS):
   """Thompson sampling on finite armed bandit."""
@@ -83,10 +116,9 @@ class DriftingFiniteBernoulliBanditTS(FiniteBernoulliBanditTS):
     assert observation == self.n_arm
 
     # All values decay slightly, observation updated
-    self.prior_success = self.prior_success * (1 - self.gamma) + self.a0 * self.gamma
-    self.prior_failure = self.prior_failure * (1 - self.gamma) + self.b0 * self.gamma
+    self.prior_success = self.prior_success * (
+        1 - self.gamma) + self.a0 * self.gamma
+    self.prior_failure = self.prior_failure * (
+        1 - self.gamma) + self.b0 * self.gamma
     self.prior_success[action] += reward
     self.prior_failure[action] += 1 - reward
-
-
-

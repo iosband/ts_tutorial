@@ -10,8 +10,8 @@ from collections import defaultdict
 from base.environment import Environment
 from graph.dijkstra import Dijkstra
 
-
 ##############################################################################
+
 
 class IndependentBinomialBridge(Environment):
   """Graph shortest path on a binomial bridge.
@@ -36,7 +36,7 @@ class IndependentBinomialBridge(Environment):
       sigma0 - prior stddev for independent edges
       sigma_tilde - observation noise stddev
     """
-    assert(n_stages % 2 == 0)
+    assert (n_stages % 2 == 0)
     self.n_stages = n_stages
     self.mu0 = mu0
     self.sigma0 = sigma0
@@ -120,7 +120,8 @@ class IndependentBinomialBridge(Environment):
     iter_node = end
     while True:
       path.append(iter_node)
-      if iter_node == start: break
+      if iter_node == start:
+        break
       iter_node = predecessor[iter_node]
 
     path.reverse()
@@ -149,7 +150,6 @@ class IndependentBinomialBridge(Environment):
 
     return -expected_distance
 
-
   def get_stochastic_reward(self, path):
     """Gets a stochastic reward for the action (in this case a path).
 
@@ -162,7 +162,7 @@ class IndependentBinomialBridge(Environment):
     time_elapsed = defaultdict(dict)
     for start_node, end_node in zip(path, path[1:]):
       mean_time = self.graph[start_node][end_node]
-      lognormal_mean = np.log(mean_time) - 0.5 * self.sigma_tilde ** 2
+      lognormal_mean = np.log(mean_time) - 0.5 * self.sigma_tilde**2
       stoch_time = np.exp(lognormal_mean + self.sigma_tilde * np.random.randn())
       time_elapsed[start_node][end_node] = stoch_time
 
@@ -171,23 +171,23 @@ class IndependentBinomialBridge(Environment):
 
 ##############################################################################
 
+
 class CorrelatedBinomialBridge(IndependentBinomialBridge):
   """ A Binomial Bridge with corrrelated elapsed time of each edge."""
 
-  def is_in_lower_half(self,start_node, end_node):
+  def is_in_lower_half(self, start_node, end_node):
     """checks whether the edge start_node-->end_node is located in the lower
     half of the bridge."""
 
     start_depth = self._get_width_bridge(start_node[0])
     end_depth = self._get_width_bridge(end_node[0])
-    if start_node[1]> start_depth/2:
-        return True
-    elif start_node[1]< start_depth/2:
-        return False
+    if start_node[1] > start_depth / 2:
+      return True
+    elif start_node[1] < start_depth / 2:
+      return False
     else:
-        return (start_depth<end_depth and end_node[1]==(start_node[1]+1)) \
-        or (start_depth>end_depth and end_node[1]==start_node[1])
-
+      return (start_depth<end_depth and end_node[1]==(start_node[1]+1)) \
+      or (start_depth>end_depth and end_node[1]==start_node[1])
 
   def get_stochastic_reward(self, path):
     """Gets a stochastic reward for the action (in this case a path).
@@ -200,18 +200,23 @@ class CorrelatedBinomialBridge(IndependentBinomialBridge):
     """
 
     #shared factors:
-    all_edges_factor = np.exp(-(self.sigma_tilde ** 2)/6 + self.sigma_tilde * np.random.randn()/np.sqrt(3))
-    upper_half_factor = np.exp(-(self.sigma_tilde ** 2)/6 + self.sigma_tilde * np.random.randn()/np.sqrt(3))
-    lower_half_factor = np.exp(-(self.sigma_tilde ** 2)/6 + self.sigma_tilde * np.random.randn()/np.sqrt(3))
+    all_edges_factor = np.exp(-(self.sigma_tilde**2) / 6 +
+                              self.sigma_tilde * np.random.randn() / np.sqrt(3))
+    upper_half_factor = np.exp(-(self.sigma_tilde**2) / 6 + self.sigma_tilde *
+                               np.random.randn() / np.sqrt(3))
+    lower_half_factor = np.exp(-(self.sigma_tilde**2) / 6 + self.sigma_tilde *
+                               np.random.randn() / np.sqrt(3))
 
     time_elapsed = defaultdict(dict)
     for start_node, end_node in zip(path, path[1:]):
       mean_time = self.graph[start_node][end_node]
-      idiosyncratic_factor = np.exp(-(self.sigma_tilde ** 2)/6 + self.sigma_tilde * np.random.randn()/np.sqrt(3))
+      idiosyncratic_factor = np.exp(
+          -(self.sigma_tilde**2) / 6 +
+          self.sigma_tilde * np.random.randn() / np.sqrt(3))
       if self.is_in_lower_half(start_node, end_node):
-          stoch_time = lower_half_factor*all_edges_factor*idiosyncratic_factor*mean_time
+        stoch_time = lower_half_factor * all_edges_factor * idiosyncratic_factor * mean_time
       else:
-          stoch_time = upper_half_factor*all_edges_factor*idiosyncratic_factor*mean_time
+        stoch_time = upper_half_factor * all_edges_factor * idiosyncratic_factor * mean_time
       time_elapsed[start_node][end_node] = stoch_time
 
     return time_elapsed
@@ -219,11 +224,12 @@ class CorrelatedBinomialBridge(IndependentBinomialBridge):
 
 ##############################################################################
 
+
 class IndependentBinomialBridgeWithBinaryReward(IndependentBinomialBridge):
   """The reward would be a binary variable indicating whether the recommended
   path was a good one."""
 
-  def __init__(self, n_stages, shape = 2, scale = 0.5):
+  def __init__(self, n_stages, shape=2, scale=0.5):
     """We only implement binomial bridge for an even number of stages.
 
     The graph is stored as a dict of dicts where graph[node1][node2] is the
@@ -234,7 +240,7 @@ class IndependentBinomialBridgeWithBinaryReward(IndependentBinomialBridge):
       shape - shape parameter of the gamma prior
       scale - scale parameter of the gamma prior
     """
-    assert(n_stages % 2 == 0)
+    assert (n_stages % 2 == 0)
     self.n_stages = n_stages
     self.shape = shape
     self.scale = scale
@@ -292,7 +298,8 @@ class IndependentBinomialBridgeWithBinaryReward(IndependentBinomialBridge):
     iter_node = end
     while True:
       path.append(iter_node)
-      if iter_node == start: break
+      if iter_node == start:
+        break
       iter_node = predecessor[iter_node]
 
     path.reverse()
@@ -303,7 +310,7 @@ class IndependentBinomialBridgeWithBinaryReward(IndependentBinomialBridge):
     if exp_argument > 500:
       self.optimal_reward = 0
     else:
-      self.optimal_reward = 1/(1+np.exp(exp_argument))
+      self.optimal_reward = 1 / (1 + np.exp(exp_argument))
 
     return path
 
@@ -314,14 +321,14 @@ class IndependentBinomialBridgeWithBinaryReward(IndependentBinomialBridge):
       path - list or list-like path of nodes from (0,0) to (n_stage, 0)
 
     Returns:
-      expected_reward - probability of getting a stochastic reward = 1 for the path
+      expected_reward - probability of getting a stochastic reward = 1 for the
+      path
     """
     total_time = 0
     for start_node, end_node in zip(path, path[1:]):
       total_time += self.graph[start_node][end_node]
 
-    return 1/(1+np.exp(total_time - self.n_stages))
-
+    return 1 / (1 + np.exp(total_time - self.n_stages))
 
   def get_stochastic_reward(self, path):
     """Gets a stochastic reward for the action (in this case a path).
@@ -333,5 +340,4 @@ class IndependentBinomialBridgeWithBinaryReward(IndependentBinomialBridge):
       binary_feedback - binary feedback received for the path
     """
     expected_reward = self.get_expected_reward(path)
-    return np.random.binomial(1,expected_reward)
-
+    return np.random.binomial(1, expected_reward)

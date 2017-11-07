@@ -1,5 +1,5 @@
-'''Agents for cascading bandit problems.
-'''
+"""Agents for cascading bandit problems.
+"""
 
 from __future__ import division
 from __future__ import print_function
@@ -9,6 +9,7 @@ import numpy as np
 from base.agent import Agent
 
 ##############################################################################
+
 
 class CascadingBanditEpsilonGreedy(Agent):
 
@@ -60,8 +61,8 @@ class CascadingBanditEpsilonGreedy(Agent):
 
   def pick_action(self, observation):
     if np.random.rand() < self.epsilon:
-      action_list = np.random.randint(low=0, high=self.num_items,
-                                      size=self.num_positions)
+      action_list = np.random.randint(
+          low=0, high=self.num_items, size=self.num_positions)
     else:
       posterior_means = self.get_posterior_mean()
       action_list = posterior_means.argsort()[::-1][:self.num_positions]
@@ -69,6 +70,7 @@ class CascadingBanditEpsilonGreedy(Agent):
 
 
 ##############################################################################
+
 
 def _ucb_1(empirical_mean, timestep, count):
   """Computes UCB1 upper confidence bound.
@@ -78,8 +80,9 @@ def _ucb_1(empirical_mean, timestep, count):
     timestep - time elapsed
     count - number of visits to that object
   """
-  confidence = np.sqrt( (1.5 * np.log(timestep)) / count)
+  confidence = np.sqrt((1.5 * np.log(timestep)) / count)
   return empirical_mean + confidence
+
 
 class CascadingBanditUCB1(CascadingBanditEpsilonGreedy):
 
@@ -95,6 +98,7 @@ class CascadingBanditUCB1(CascadingBanditEpsilonGreedy):
 
 
 ##############################################################################
+
 
 def _kl_ucb(empirical_mean, timestep, count, tolerance=1e-3, maxiter=25):
   """Computes KL-UCB via binary search
@@ -123,10 +127,13 @@ def _kl_ucb(empirical_mean, timestep, count, tolerance=1e-3, maxiter=25):
       upper_bound = midpoint
 
     if n_iter > maxiter:
-      print('WARNING: maximum number of iterations exceeded, accuracy only %0.2f' % (upper_bound - lower_bound, ))
+      print(
+          'WARNING: maximum number of iterations exceeded, accuracy only %0.2f'
+          % (upper_bound - lower_bound,))
       break
 
   return lower_bound
+
 
 def _d_kl(p, q, epsilon=1e-6):
   """Compute the KL divergence for single numbers."""
@@ -135,12 +142,13 @@ def _d_kl(p, q, epsilon=1e-6):
   else:
     A = np.inf if q <= epsilon else p * np.log(p / q)
 
-  if p >= 1-epsilon:
+  if p >= 1 - epsilon:
     B = 0
   else:
     B = np.inf if q >= 1 - epsilon else (1 - p) * np.log((1 - p) / (1 - q))
 
   return A + B
+
 
 class CascadingBanditKLUCB(CascadingBanditEpsilonGreedy):
 
@@ -156,6 +164,7 @@ class CascadingBanditKLUCB(CascadingBanditEpsilonGreedy):
 
 
 ##############################################################################
+
 
 class CascadingBanditTS(CascadingBanditEpsilonGreedy):
 

@@ -1,11 +1,11 @@
-'''Agents for graph bandit problems.
+"""Agents for graph bandit problems.
 
 These agents became too large to comfortably keep in one file, so we divided
 it up into three separate sections for:
 - Independent Binomial Bridge
 - Correlated Binomial Bridge
 - Independent Binomial Bridge with Binary Reward
-'''
+"""
 
 from __future__ import division
 from __future__ import print_function
@@ -19,8 +19,8 @@ from collections import defaultdict
 from base.agent import Agent
 from graph.env_graph_bandit import IndependentBinomialBridge
 
-
 ##############################################################################
+
 
 class IndependentBBEpsilonGreedy(Agent):
   """Independent Binomial Bridge Epsilon Greedy"""
@@ -35,7 +35,7 @@ class IndependentBBEpsilonGreedy(Agent):
       sigma_tilde - noise on observation
       epsilon - probability of random path selection
     """
-    assert(n_stages % 2 == 0)
+    assert (n_stages % 2 == 0)
     self.n_stages = n_stages
     self.mu0 = mu0
     self.sigma0 = sigma0
@@ -54,7 +54,7 @@ class IndependentBBEpsilonGreedy(Agent):
   def get_posterior_mean(self):
     """Gets the posterior mean for each edge.
 
-    Return:
+    Returns:
       edge_length - dict of dicts edge_length[start_node][end_node] = distance
     """
     edge_length = copy.deepcopy(self.posterior)
@@ -62,12 +62,12 @@ class IndependentBBEpsilonGreedy(Agent):
     for start_node in self.posterior:
       for end_node in self.posterior[start_node]:
         mean, std = self.posterior[start_node][end_node]
-        edge_length[start_node][end_node] = np.exp(mean + 0.5 * std ** 2)
+        edge_length[start_node][end_node] = np.exp(mean + 0.5 * std**2)
 
     return edge_length
 
   def get_posterior_sample(self):
-    """Gets a posterior sample for each edge
+    """Gets a posterior sample for each edge.
 
     Return:
       edge_length - dict of dicts edge_length[start_node][end_node] = distance
@@ -77,19 +77,20 @@ class IndependentBBEpsilonGreedy(Agent):
     for start_node in self.posterior:
       for end_node in self.posterior[start_node]:
         mean, std = self.posterior[start_node][end_node]
-        edge_length[start_node][end_node] = np.exp(mean + std * np.random.randn())
+        edge_length[start_node][end_node] = np.exp(mean +
+                                                   std * np.random.randn())
 
     return edge_length
 
   def update_observation(self, observation, action, reward):
-    """Updates observations for binomial bridge
+    """Updates observations for binomial bridge.
 
     Args:
       observation - number of stages
       action - path chosen by the agent (not used)
       reward - dict of dict reward[start_node][end_node] = stochastic_time
     """
-    assert(observation == self.n_stages)
+    assert observation == self.n_stages
 
     for start_node in reward:
       for end_node in reward[start_node]:
@@ -97,12 +98,12 @@ class IndependentBBEpsilonGreedy(Agent):
         old_mean, old_std = self.posterior[start_node][end_node]
 
         # convert std into precision for easier algebra
-        old_precision = 1. / (old_std ** 2)
-        noise_precision = 1. / (self.sigma_tilde ** 2)
+        old_precision = 1. / (old_std**2)
+        noise_precision = 1. / (self.sigma_tilde**2)
         new_precision = old_precision + noise_precision
 
-        new_mean = (noise_precision * (np.log(y) + 0.5 / noise_precision)
-                    + old_precision * old_mean ) / new_precision
+        new_mean = (noise_precision * (np.log(y) + 0.5 / noise_precision) +
+                    old_precision * old_mean) / new_precision
         new_std = np.sqrt(1. / new_precision)
 
         # update the posterior in place
@@ -132,8 +133,8 @@ class IndependentBBEpsilonGreedy(Agent):
     return path
 
 
-
 ##############################################################################
+
 
 class IndependentBBTS(IndependentBBEpsilonGreedy):
   """Independent Binomial Bridge Thompson Sampling"""
@@ -145,4 +146,3 @@ class IndependentBBTS(IndependentBBEpsilonGreedy):
     path = self.internal_env.get_shortest_path()
 
     return path
-

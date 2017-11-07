@@ -1,6 +1,6 @@
 """ Environment determines the underlying law of the system.
 
-All bandit problems should inherit from environment
+All bandit problems should inherit from environment.
 """
 
 from __future__ import division

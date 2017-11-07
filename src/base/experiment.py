@@ -1,6 +1,8 @@
 """ Experiment wraps an agent with an environment and then runs the experiment.
 
-We will actually run an experiment.
+We end up with several experiment variants since we might want to log different
+elements of the agent/environment interaction. At the end of `run_experiment` we
+save the key results for plotting in a pandas dataframe `experiment.results`.
 """
 
 from __future__ import division
@@ -18,13 +20,15 @@ class BaseExperiment(object):
   If you want to do something more fancy then you should extend this class.
   """
 
-  def __init__(self, agent, environment, seed=0, rec_freq=1, unique_id='NULL'):
+  def __init__(self, agent, environment, n_steps,
+               seed=0, rec_freq=1, unique_id='NULL'):
     """Setting up the experiment.
 
     Note that unique_id should be used to identify the job later for analysis.
     """
     self.agent = agent
     self.environment = environment
+    self.n_steps = n_steps
     self.seed = seed
     self.unique_id = unique_id
 
@@ -62,18 +66,20 @@ class BaseExperiment(object):
       self.results.append(self.data_dict)
 
 
-  def run_experiment(self, n_steps):
+  def run_experiment(self):
     """Run the experiment for n_steps and collect data."""
     np.random.seed(self.seed)
     self.cum_regret = 0
+    self.cum_optimal = 0
 
-    for t in range(n_steps):
+    for t in range(self.n_steps):
       self.run_step_maybe_log(t)
 
     self.results = pd.DataFrame(self.results)
 
 
 ##############################################################################
+
 
 class ExperimentWithMean(BaseExperiment):
 
@@ -105,6 +111,41 @@ class ExperimentWithMean(BaseExperiment):
                         'unique_id': self.unique_id}
       self.results.append(self.data_dict)
 
+
+##############################################################################
+
+
+class ExperimentNoAction(BaseExperiment):
+
+  def run_step_maybe_log(self, t):
+    # Evolve the bandit (potentially contextual) for one step and pick action
+    observation = self.environment.get_observation()
+    action = self.agent.pick_action(observation)
+
+    # Compute useful stuff for regret calculations
+    optimal_reward = self.environment.get_optimal_reward()
+    expected_reward = self.environment.get_expected_reward(action)
+    reward = self.environment.get_stochastic_reward(action)
+
+    # Update the agent using realized rewards + bandit learing
+    self.agent.update_observation(observation, action, reward)
+
+    # Log whatever we need for the plots we will want to use.
+    instant_regret = optimal_reward - expected_reward
+    self.cum_optimal += optimal_reward
+    self.cum_regret += instant_regret
+
+    # Advance the environment (used in nonstationary experiment)
+    self.environment.advance(action, reward)
+
+    if (t + 1) % self.rec_freq == 0:
+      self.data_dict = {'t': (t + 1),
+                        'instant_regret': instant_regret,
+                        'cum_regret': self.cum_regret,
+                        'cum_optimal': self.cum_optimal,
+                        'unique_id': self.unique_id}
+      self.results.append(self.data_dict)
+
 ##############################################################################
 
 class DebugExperiment(BaseExperiment):
@@ -124,6 +165,7 @@ class DebugExperiment(BaseExperiment):
 
     # Log whatever we need for the plots we will want to use.
     instant_regret = optimal_reward - expected_reward
+    self.cum_optimal += optimal_reward
     self.cum_regret += instant_regret
 
     # Advance the environment (used in nonstationary experiment)
@@ -132,7 +174,7 @@ class DebugExperiment(BaseExperiment):
     if (t + 1) % self.rec_freq == 0:
       self.data_dict = {'t': (t + 1),
                         'action': action,
-                        'optimal_reward': optimal_reward,
+                        'cum_optimal': self.cum_optimal,
                         'expected_reward': expected_reward,
                         'instant_regret': instant_regret,
                         'cum_regret': self.cum_regret,
