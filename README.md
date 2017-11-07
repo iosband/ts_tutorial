@@ -18,7 +18,14 @@ Next, install the dependencies:
 - [plotnine](https://github.com/has2k1/plotnine) a grammar of graphic plotting library for Python.
 - [cvxpy](http://www.cvxpy.org/en/latest/install/index.html) a package for convex optimization, only used for the dynamic pricing example.
 
-All code is written assuming a path from `ts_tutorial/src`.
+If you are using the (recommended) [Anaconda](https://anaconda.org/anaconda/python) python distribution then you can accomplish this simply by running:
+```
+conda install -c conda-forge plotnine
+conda install -c cvxgrp cvxpy libgcc
+```
+We are working on packaging this tutorial so that in future versions this might all happen automatically from a single command line call.
+
+For now, all code is written assuming a path from `ts_tutorial/src`.
 To run a a simple experiment of Thompson sampling versus greedy decision making:
 ```
 cd ts_tutorial/src
