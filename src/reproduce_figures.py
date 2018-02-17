@@ -105,7 +105,7 @@ def reproduce_figure(figure_options, run_frac, data_path, plot_path):
   # Running the jobs via command line (this can/should be parallelized)
   for i in range(n_jobs):
     print('Starting job {} out of {}'.format(i, n_jobs))
-    os.system('ipython batch_runner.py -- --config {} --job_id {} --save_path {}'
+    os.system('ipython batch_runner.py --config {} --job_id {} --save_path {}'
               .format(figure_options.config, i, data_path))
 
   # Plotting output
@@ -134,6 +134,7 @@ if __name__ == '__main__':
   args = parser.parse_args()
   assert args.run_frac >= 0.
   assert args.run_frac <= 1.
+  assert args.figure in set(FIGURE_OPTIONS.keys() + ['all'])
 
   print('*' * 80)
   print('Parsing command line fig={}, run_frac={}, data_path={}, save_path={}'
