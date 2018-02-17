@@ -36,9 +36,6 @@ def get_config():
                           n_stages, shape, scale, tol, alpha, beta)),
        ('Laplace',
         functools.partial(LaplaceIndependentBBWithBinaryReward,
-                          n_stages, shape, scale, tol, alpha, beta)),
-       ('Langevin',
-        functools.partial(LangevinMCMCIndependentBBWithBinaryReward,
                           n_stages, shape, scale, tol, alpha, beta))]
   )
 

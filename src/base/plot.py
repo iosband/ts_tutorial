@@ -22,7 +22,7 @@ sys.path.append(os.getcwd())
 gg.theme_set(gg.theme_bw(base_size=16, base_family='serif'))
 gg.theme_update(figure_size=(8, 8))
 
-_DEFAULT_DATA_PATH = '/path/to/your/data'
+_DEFAULT_DATA_PATH = '/tmp/'
 _DATA_CACHE = {}
 
 #############################################################################
@@ -111,7 +111,7 @@ def simple_algorithm_plot(experiment_name, data_path=_DEFAULT_DATA_PATH):
     data_path: string = where to look for the files.
 
   Returns:
-    p: ggplot plot
+    plot_dict: {experiment_name: ggplot plot}
   """
   df = load_data(experiment_name, data_path)
   plt_df = (df.groupby(['t', 'agent'])
@@ -123,7 +123,7 @@ def simple_algorithm_plot(experiment_name, data_path=_DEFAULT_DATA_PATH):
        + gg.xlab('Timestep (t)')
        + gg.ylab('Average instantaneous regret')
        + gg.scale_colour_brewer(name='Agent', type='qual', palette='Set1'))
-  return p
+  return {experiment_name: p}
 
 
 def cumulative_travel_time_plot(experiment_name, data_path=_DEFAULT_DATA_PATH):
@@ -134,7 +134,7 @@ def cumulative_travel_time_plot(experiment_name, data_path=_DEFAULT_DATA_PATH):
     data_path: string = where to look for the files.
 
   Returns:
-    p: ggplot plot
+    plot_dict: {experiment_name: ggplot plot}
   """
   df = load_data(experiment_name, data_path)
   df['cum_ratio'] = (df.cum_optimal - df.cum_regret) / df.cum_optimal
@@ -149,7 +149,7 @@ def cumulative_travel_time_plot(experiment_name, data_path=_DEFAULT_DATA_PATH):
        + gg.scale_colour_brewer(name='Agent', type='qual', palette='Set1')
        + gg.aes(ymin=1)
        + gg.geom_hline(yintercept=1, linetype='dashed', size=2, alpha=0.5))
-  return p
+  return {experiment_name: p}
 
 
 #############################################################################
@@ -190,7 +190,7 @@ def compare_action_selection_plot(experiment_name='finite_simple',
 
 def misspecified_plot(experiment_name='finite_misspecified',
                       data_path=_DEFAULT_DATA_PATH):
-"""Specialized plotting script for TS tutorial paper misspecified TS."""
+  """Specialized plotting script for TS tutorial paper misspecified TS."""
   df = load_data(experiment_name, data_path)
 
   def _parse_np_array(np_string):
