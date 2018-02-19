@@ -149,7 +149,7 @@ def cumulative_travel_time_plot(experiment_name, data_path=_DEFAULT_DATA_PATH):
        + gg.scale_colour_brewer(name='Agent', type='qual', palette='Set1')
        + gg.aes(ymin=1)
        + gg.geom_hline(yintercept=1, linetype='dashed', size=2, alpha=0.5))
-  return {experiment_name: p}
+  return {experiment_name+'_cum': p}
 
 
 #############################################################################

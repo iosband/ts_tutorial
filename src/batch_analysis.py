@@ -36,12 +36,12 @@ simple_plots = ['finite_simple', 'finite_simple_rand', 'finite_simple_sanity',
                 'finite_drift', 'cascade', 'graph_indep', 'graph_indep_binary',
                 'graph_correlated', 'graph_correlated_sanity']
 for plot_name in simple_plots:
-  plot_dict[plot_name] = bp.simple_algorithm_plot(plot_name)
+  plot_dict.update(bp.simple_algorithm_plot(plot_name))
 
 # Graph plots also do cumulative distance
 cumulative_plots = ['graph_indep', 'graph_correlated']
 for plot_name in cumulative_plots:
-  plot_dict[plot_name + '_cum'] = bp.cumulative_travel_time_plot(plot_name)
+  plot_dict.update(bp.cumulative_travel_time_plot(plot_name))
 
 # Comparing action selection greedy/ts
 plot_dict.update(bp.compare_action_selection_plot())
