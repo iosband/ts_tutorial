@@ -196,23 +196,38 @@ def main(fig_str, run_frac, data_path, plot_path):
 if __name__ == '__main__':
   # Parsing command line options
   parser = argparse.ArgumentParser(description='Reproduce figures.')
-  fig_help = ('Figures to reproduce, must be one of the following options:\n'
+  fig_help = ('Figures to reproduce. Must be one of the following options:\n'
               '{}'.format(FIGURE_OPTIONS.keys() + ['all']))
   parser.add_argument('--figure', help=fig_help, type=str, default='3')
-  run_help = 'Proportion of paper experiments to run in [0, 1]'
+  run_help = 'Proportion of paper experiments to run. Must be in [0, 1].'
   parser.add_argument('--run_frac', help=run_help, type=float, default=0.01)
-  data_help = 'Path to store intermediate .csv files of experiment results (must exist in os).'
+  data_help = 'Path to store intermediate .csv files of experiment results. Must exist in OS.'
   parser.add_argument('--data_path', help=data_help, type=str, default='/tmp/')
-  plot_help = 'Path to store output paper plots (must exist in os).'
+  plot_help = 'Path to store output paper plots. Must exist in OS.'
   parser.add_argument('--plot_path', help=plot_help, type=str, default='/tmp/')
   args = parser.parse_args()
 
   # Checking valid command line options
-  assert args.run_frac >= 0., run_help
-  assert args.run_frac <= 1., run_help
-  assert args.figure in set(FIGURE_OPTIONS.keys() + ['all']), fig_help
-  assert os.path.isdir(args.data_path), data_help
-  assert os.path.isdir(args.plot_path), plot_help
+  run_frac_err = (run_help
+                  + '\n\tYour input run_frac={}, please try again.'
+                  .format(args.run_frac))
+  assert args.run_frac >= 0., run_frac_err
+  assert args.run_frac <= 1., run_frac_err
+
+  figure_err = (fig_help
+                + '\n\tYour input figure={}, please try again.'
+                .format(args.figure))
+  assert args.figure in set(FIGURE_OPTIONS.keys() + ['all']), figure_err
+
+  dat_err =  (data_help
+              + '\n\tYour input data_path={}, please try again.'
+              .format(args.data_path))
+  assert os.path.isdir(args.data_path), data_err
+
+  plot_err = (plot_help
+              + '\n\tYour input data_path={}, please try again.'
+              .format(args.plot_path))
+  assert os.path.isdir(args.plot_path), plot_err
 
   # Logging to screen
   print('*' * 80)
