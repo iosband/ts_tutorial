@@ -25,6 +25,8 @@ gg.theme_set(gg.theme_bw(base_size=16, base_family='serif'))
 
 # FIGURE_OPTIONS will hold all of the details for specific details to reproduce
 # each figure. These include the config, number of jobs and the plot function.
+# Figures are named with reference to "A Tutorial on Thompson Sampling":
+#     https://arxiv.org/abs/1707.02038.
 
 FigureOptions = collections.namedtuple(
     'FigureOptions', ['fig_name', 'config','paper_n_jobs', 'plot_fun'])
@@ -84,8 +86,58 @@ FIGURE_OPTIONS = collections.OrderedDict([
 ###############################################################################
 # Functions to reproduce each figure in the tutorial paper
 
+def _load_experiment_name_from_config(config_path):
+  """Extract the identifying experiment name from config."""
+  experiment_config = importlib.import_module(config_path)
+  config = experiment_config.get_config()
+  return config.name
+
+
+def _logging(figure_options, run_frac, data_path, plot_path):
+  """Logging to screen.
+
+  Args:
+    figure_options: a FigureOptions namedtuple.
+    run_frac: float in [0,1] of how many jobs to run vs paper.
+    data_path: where to save intermediate experiment .csv.
+    plot_path: where to save output plot.
+
+  Returns:
+    experiment_name: identifying string from config file.
+    n_jobs: number of jobs to run.
+  """
+  experiment_name = _load_experiment_name_from_config(figure_options.config)
+  n_jobs = int(run_frac * figure_options.paper_n_jobs)
+
+  # Logging to screen
+  print('*' * 80)
+  print('Reproducing Figure {}, from TS Tutorial https://arxiv.org/abs/1707.02038'
+         .format(figure_options.fig_name))
+  print('With run_frac {} this will launch {} jobs, compared to {} in the paper.'
+        .format(run_frac, n_jobs, figure_options.paper_n_jobs))
+  print('The config file with all necessary details of the underlying'
+        ' experiment is \n   {}.'.format(figure_options.config))
+  print('The experiment results are saved to {} with experiment_id {}.'
+        .format(data_path, experiment_name))
+  print('The output plots are saved to {} with experiment_id {}.'
+        .format(plot_path, experiment_name))
+  print('\n')
+  print('*' * 80)
+
+  return experiment_name, n_jobs
+
+
 def _save_plot_to_file(plot_dict, plot_path, run_frac=None):
-  """Plots a dictionary of plotnine plots to file."""
+  """Plots a dictionary of plotnine plots to file.
+
+  Args:
+    plot_dict: {plot_name: p} for p = plotnine plot.
+    plot_path: path to save the file to.
+    run_frac: optional float indicating run fraction (just for logging.)
+
+  Returns:
+    NULL, plot is written to file_path as a png file.
+  """
   for plot_name, p in plot_dict.iteritems():
     file_path = os.path.join(plot_path, plot_name.lower() + '.png')
     file_path = file_path.replace(' ', '_')
@@ -102,11 +154,6 @@ def _save_plot_to_file(plot_dict, plot_path, run_frac=None):
       p.save(file_path, height=8, width=8)
 
 
-def _load_experiment_name_from_config(config_path):
-  experiment_config = importlib.import_module(config_path)
-  config = experiment_config.get_config()
-  return config.name
-
 
 def reproduce_figure(figure_options, run_frac, data_path, plot_path):
   """Function to reproduce figures for TS tutorial.
@@ -120,22 +167,8 @@ def reproduce_figure(figure_options, run_frac, data_path, plot_path):
   Returns:
     None, experiment results are written to data_path and plots to plot_path.
   """
-  experiment_name = _load_experiment_name_from_config(figure_options.config)
-  n_jobs = int(run_frac * figure_options.paper_n_jobs)
-
-  # Logging to screen
-  print('Reproducing Figure {}, from TS Tutorial https://arxiv.org/abs/1707.02038'
-         .format(figure_options.fig_name))
-  print('With run_frac {} this will launch {} jobs, compared to {} in the paper.'
-        .format(run_frac, n_jobs, figure_options.paper_n_jobs))
-  print('The config file with all necessary details of the underlying'
-        ' experiment is \n   {}.'.format(figure_options.config))
-  print('The experiment results are saved to {} with experiment_id {}.'
-        .format(data_path, experiment_name))
-  print('The output plots are saved to {} with experiment_id {}.'
-        .format(plot_path, experiment_name))
-  print('\n')
-  print('*' * 80)
+  experiment_name, n_jobs = _logging(
+      figure_options, run_frac, data_path, plot_path)
 
   # Running the jobs via command line (this can/should be parallelized)
   for i in range(n_jobs):
@@ -147,6 +180,14 @@ def reproduce_figure(figure_options, run_frac, data_path, plot_path):
   plot_dict = figure_options.plot_fun(experiment_name, data_path)
   _save_plot_to_file(plot_dict, plot_path, run_frac)
 
+
+def main(fig_str, run_frac, data_path, plot_path):
+  """Either runs all of the experiments, or just a single figure."""
+  if fig_str == 'all':
+    for fig in FIGURE_OPTIONS:
+      reproduce_figure(FIGURE_OPTIONS[fig], run_frac, data_path, plot_path)
+  else:
+    reproduce_figure(FIGURE_OPTIONS[fig_str], run_frac, data_path, plot_path)
 
 
 ###############################################################################
@@ -180,15 +221,7 @@ if __name__ == '__main__':
   print('WARNING - this can take a long time on a single machine... you may want to parallelize the jobs.\n')
 
   # Running jobs
-  if args.figure == 'all':
-    for fig in FIGURE_OPTIONS:
-      reproduce_figure(FIGURE_OPTIONS[fig], args.run_frac,
-                       args.data_path, args.plot_path)
-
-  else:
-    reproduce_figure(FIGURE_OPTIONS[args.figure], args.run_frac,
-                     args.data_path, args.plot_path)
-
+  main(args.figure, args.run_frac, args.data_path, args.plot_path)
 
 
 
