@@ -201,18 +201,18 @@ if __name__ == '__main__':
   parser.add_argument('--figure', help=fig_help, type=str, default='3')
   run_help = 'Proportion of paper experiments to run in [0, 1]'
   parser.add_argument('--run_frac', help=run_help, type=float, default=0.01)
-  data_help = 'Path to store intermediate .csv files of experiment results.'
+  data_help = 'Path to store intermediate .csv files of experiment results (must exist in os).'
   parser.add_argument('--data_path', help=data_help, type=str, default='/tmp/')
-  plot_help = 'Path to store output paper plots.'
+  plot_help = 'Path to store output paper plots (must exist in os).'
   parser.add_argument('--plot_path', help=plot_help, type=str, default='/tmp/')
   args = parser.parse_args()
 
   # Checking valid command line options
-  assert args.run_frac >= 0.
-  assert args.run_frac <= 1.
-  assert args.figure in set(FIGURE_OPTIONS.keys() + ['all'])
-  assert os.path.isdir(args.data_path)
-  assert os.path.isdir(args.plot_path)
+  assert args.run_frac >= 0., run_help
+  assert args.run_frac <= 1., run_help
+  assert args.figure in set(FIGURE_OPTIONS.keys() + ['all']), fig_help
+  assert os.path.isdir(args.data_path), data_help
+  assert os.path.isdir(args.plot_path), plot_help
 
   # Logging to screen
   print('*' * 80)
