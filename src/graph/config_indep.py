@@ -2,7 +2,7 @@
 
 Binomial bridge bandit experiment with independent segments.
 Compare the performance of Thompson sampling with different egreedy.
-See Figure 6 https://arxiv.org/pdf/1707.02038.pdf
+See Figure 7 https://arxiv.org/pdf/1707.02038.pdf
 """
 
 from __future__ import absolute_import
@@ -28,7 +28,7 @@ def get_config():
   sigma_tilde = 1
 
   agents = collections.OrderedDict(
-      [('ts',
+      [('TS',
         functools.partial(IndependentBBTS,
                           n_stages, mu0, sigma0, sigma_tilde)),
        ('greedy',

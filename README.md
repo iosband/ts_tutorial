@@ -3,11 +3,12 @@ A Tutorial on Thompson Sampling - Accompanying Code
 
 **Authors:** Dan Russo, Benjamin Van Roy, Abbas Kazerouni, Ian Osband, Zheng Wen
 
-This is a git repository to release and share the code from our paper [A Tutorial on Thompson Sampling](https://arxiv.org/abs/1707.02038).
+This is a git repository to release and share the code from our paper [A Tutorial on Thompson Sampling](https://web.stanford.edu/~bvr/pubs/TS_Tutorial.pdf).
 
 All of the figures and results contained in the paper are generated through running the code contained in this repository.
 
-
+Note that as of 29th June 2018 the version of this paper posted to arXiv is out of date, we are working to address this issue.
+Please contact the authors if you have any trouble/questions.
 
 ## Installation
 

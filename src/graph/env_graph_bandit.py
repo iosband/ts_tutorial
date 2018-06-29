@@ -341,3 +341,24 @@ class IndependentBinomialBridgeWithBinaryReward(IndependentBinomialBridge):
     """
     expected_reward = self.get_expected_reward(path)
     return np.random.binomial(1, expected_reward)
+
+##############################################################################
+class MultiAgentCorrelatedBinomialBridge(IndependentBinomialBridge):
+  '''Binomail Brdige with independent travel times for multiple agents.'''
+  
+  def get_expected_reward(self, paths):
+    '''determines the expected reward for each of the agents.'''
+    
+    expected_rewards = [IndependentBinomialBridge.get_expected_reward(self,path)
+    for path in paths]
+    expected_rewards = np.array(expected_rewards)
+    return expected_rewards
+  
+  def get_stochastic_reward(self, paths):
+    '''gives the stochastic reward observed by each agent.'''
+    
+    times_elapsed = [IndependentBinomialBridge.get_stochastic_reward(self,path)
+    for path in paths]
+    return times_elapsed
+      
+      

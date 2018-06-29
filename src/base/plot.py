@@ -20,9 +20,9 @@ import plotnine as gg
 
 sys.path.append(os.getcwd())
 gg.theme_set(gg.theme_bw(base_size=16, base_family='serif'))
-gg.theme_update(figure_size=(8, 8))
+gg.theme_update(figure_size=(10, 8))
 
-_DEFAULT_DATA_PATH = '/tmp/'
+_DEFAULT_DATA_PATH = '/path/to/your/data'
 _DATA_CACHE = {}
 
 #############################################################################
@@ -46,7 +46,7 @@ def _name_cleaner(agent_name):
                  'action_0': 'Action 0',
                  'action_1': 'Action 1',
                  'action_2': 'Action 2',
-                 'bootstrap': 'Bootstrap TS',
+                 'bootstrap': 'bootstrap TS',
                  'laplace': 'Laplace TS',
                  'thoughtful': 'Thoughtful TS',
                  'gibbs': 'Gibbs TS'}
@@ -111,7 +111,7 @@ def simple_algorithm_plot(experiment_name, data_path=_DEFAULT_DATA_PATH):
     data_path: string = where to look for the files.
 
   Returns:
-    plot_dict: {experiment_name: ggplot plot}
+    https://web.stanford.edu/~bvr/pubs/TS_Tutorial.pdf
   """
   df = load_data(experiment_name, data_path)
   plt_df = (df.groupby(['t', 'agent'])
@@ -120,10 +120,12 @@ def simple_algorithm_plot(experiment_name, data_path=_DEFAULT_DATA_PATH):
   p = (gg.ggplot(plt_df)
        + gg.aes('t', 'instant_regret', colour='agent')
        + gg.geom_line(size=1.25, alpha=0.75)
-       + gg.xlab('Timestep (t)')
-       + gg.ylab('Average instantaneous regret')
-       + gg.scale_colour_brewer(name='Agent', type='qual', palette='Set1'))
-  return {experiment_name: p}
+       + gg.xlab('time period (t)')
+       + gg.ylab('per-period regret')
+       + gg.scale_colour_brewer(name='agent', type='qual', palette='Set1'))
+  
+  plot_dict = {experiment_name + '_simple': p}
+  return plot_dict
 
 
 def cumulative_travel_time_plot(experiment_name, data_path=_DEFAULT_DATA_PATH):
@@ -134,7 +136,7 @@ def cumulative_travel_time_plot(experiment_name, data_path=_DEFAULT_DATA_PATH):
     data_path: string = where to look for the files.
 
   Returns:
-    plot_dict: {experiment_name: ggplot plot}
+    https://web.stanford.edu/~bvr/pubs/TS_Tutorial.pdf
   """
   df = load_data(experiment_name, data_path)
   df['cum_ratio'] = (df.cum_optimal - df.cum_regret) / df.cum_optimal
@@ -144,12 +146,14 @@ def cumulative_travel_time_plot(experiment_name, data_path=_DEFAULT_DATA_PATH):
   p = (gg.ggplot(plt_df)
        + gg.aes('t', 'cum_ratio', colour='agent')
        + gg.geom_line(size=1.25, alpha=0.75)
-       + gg.xlab('Timestep (t)')
+       + gg.xlab('time period (t)')
        + gg.ylab('Total distance / optimal')
-       + gg.scale_colour_brewer(name='Agent', type='qual', palette='Set1')
+       + gg.scale_colour_brewer(name='agent', type='qual', palette='Set1')
        + gg.aes(ymin=1)
        + gg.geom_hline(yintercept=1, linetype='dashed', size=2, alpha=0.5))
-  return {experiment_name+'_cum': p}
+  
+  plot_dict = {experiment_name + '_cum': p}
+  return plot_dict
 
 
 #############################################################################
@@ -168,7 +172,7 @@ def plot_action_proportion(df_agent):
   p = (gg.ggplot(pd.melt(plt_df, id_vars='t'))
        + gg.aes('t', 'value', colour='variable', group='variable')
        + gg.geom_line(size=1.25, alpha=0.75)
-       + gg.xlab('Timestep (t)')
+       + gg.xlab('time period (t)')
        + gg.ylab('Action probability')
        + gg.ylim(0, 1)
        + gg.scale_colour_brewer(name='Variable', type='qual', palette='Set1'))
@@ -215,9 +219,9 @@ def misspecified_plot(experiment_name='finite_misspecified',
   regret_plot = (gg.ggplot(plt_df)
                  + gg.aes('t', 'instant_regret', colour='agent')
                  + gg.geom_line(size=1.25, alpha=0.75)
-                 + gg.xlab('Timestep (t)')
-                 + gg.ylab('Average instantaneous regret')
-                 + gg.scale_colour_brewer(name='Agent', type='qual', palette='Set1')
+                 + gg.xlab('time period (t)')
+                 + gg.ylab('per-period regret')
+                 + gg.scale_colour_brewer(name='agent', type='qual', palette='Set1')
                  + gg.coord_cartesian(ylim=(0, 0.02)))
 
   melt_df = pd.melt(plt_df, id_vars=['agent', 't'], value_vars=new_col_list)
@@ -226,9 +230,9 @@ def misspecified_plot(experiment_name='finite_misspecified',
                  + gg.aes('t', 'value', colour='agent', group='group_id')
                  + gg.geom_line(size=1.25, alpha=0.75)
                  + gg.coord_cartesian(ylim=(0, 0.05))
-                 + gg.xlab('Timestep (t)')
+                 + gg.xlab('time period (t)')
                  + gg.ylab('Expected mean reward')
-                 + gg.scale_colour_brewer(name='Agent', type='qual', palette='Set1'))
+                 + gg.scale_colour_brewer(name='agent', type='qual', palette='Set1'))
 
   plot_dict = {}
   plot_dict['misspecified_regret'] = regret_plot
@@ -278,9 +282,9 @@ def ensemble_plot(experiment_name='ensemble_nn', data_path=_DEFAULT_DATA_PATH):
                        'Ensemble 100', 'Ensemble 300']
       gg_legend = gg.scale_colour_manual(values=custom_colors,
                                          labels=custom_labels,
-                                         name='Agent')
+                                         name='agent')
     else:
-      gg_legend = gg.scale_colour_manual(custom_colors, name='Agent')
+      gg_legend = gg.scale_colour_manual(custom_colors, name='agent')
 
     p = (gg.ggplot(df_family)
          + gg.aes('t', 'instant_regret', colour='agent_name')
@@ -288,11 +292,117 @@ def ensemble_plot(experiment_name='ensemble_nn', data_path=_DEFAULT_DATA_PATH):
          + gg.facet_wrap('~ agent_family')
          + gg_legend
          + gg.coord_cartesian(ylim=(0, 60))
-         + gg.xlab('Timestep (t)')
-         + gg.ylab('Average instantaneous regret')
+         + gg.xlab('time period (t)')
+         + gg.ylab('per-period regret')
          + gg.theme(figure_size=(6, 6)))
     plot_dict[experiment_name + '_' + agent_family] = p
 
   return plot_dict
 
+###############################################################################
+# plotting concurrent agents regret
+ 
+def get_agent_id(agent_name):
+  letters = {1:'a',10:'b',20:'c',50:'d',100:'e'}
+  agent_num = int(agent_name.split(' = ')[1])
+  return letters[agent_num]
 
+def concurrent_agents_plot(experiment_name='graph_indep_concurrent', 
+                           data_path=_DEFAULT_DATA_PATH, paper_version=True):
+  '''Passing paper_version=True should be used to reproduce Fig. 14 of the paper 
+  for K = 1,10,20,50,100. In this case, the labels in the legend are manually 
+  ordered by the values of K. Otherwise, the labels are ordered alphabetically.'''
+  
+  df = load_data(data_path, experiment_name)
+  
+  plt_df_per_action = (df.groupby(['agent','t','agent_id','action_id'])
+            .agg({'instant_regret': np.mean})
+            .reset_index())
+  
+  plt_df_per_period = (df.groupby(['agent','t'])
+            .agg({'instant_regret': np.mean})
+            .reset_index())
+  
+  if not paper_version:
+    p_per_action = (gg.ggplot(plt_df_per_action)
+       + gg.aes('action_id', 'instant_regret', colour='agent')
+       + gg.geom_line()+ gg.geom_line(size=1.25, alpha=0.75)
+       + gg.xlim(0, 2.5*len(plt_df_per_period.groupby('t')))
+       + gg.scale_colour_brewer(name='agent', type='qual', palette='Set1')
+       + gg.labels.xlab('number of actions')
+       + gg.labels.ylab('per-period regret'))
+    
+    p_per_period = (gg.ggplot(plt_df_per_period)
+       + gg.aes('t', 'instant_regret', colour='agent')
+       + gg.geom_line()+ gg.geom_line(size=1.25, alpha=0.75)
+       + gg.scale_colour_brewer(name='agent', type='qual', palette='Set1')
+       + gg.labels.xlab('time period (t)')
+       + gg.labels.ylab('per-period regret'))
+  else:
+    plt_df_per_action['agent_id'] = plt_df_per_action.agent.apply(get_agent_id)
+    plt_df_per_period['agent_id'] = plt_df_per_period.agent.apply(get_agent_id)
+    
+    custom_labels = ['K = 1','K = 10','K = 20','K = 50','K = 100']
+    custom_colors = ["#E41A1C","#377EB8","#4DAF4A","#984EA3","#FF7F00"]
+    
+    p_per_action = (gg.ggplot(plt_df_per_action)
+      + gg.aes('action_id', 'instant_regret', colour='agent_id')
+      + gg.geom_line()+ gg.geom_line(size=1.25, alpha=0.75)
+      + gg.xlim(0, 2.5*len(plt_df_per_period.groupby('t')))
+      + gg.scale_color_manual(name='agent', labels = custom_labels,values=custom_colors)
+      + gg.labels.xlab('number of actions')
+      + gg.labels.ylab('per-action regret'))
+  
+    p_per_period = (gg.ggplot(plt_df_per_period)
+      + gg.aes('t', 'instant_regret', colour='agent_id')
+      + gg.geom_line()+ gg.geom_line(size=1.25, alpha=0.75)
+      + gg.scale_color_manual(name='agent', labels = custom_labels,values=custom_colors)
+      + gg.labels.xlab('time period (t)')
+      + gg.labels.ylab('per-period regret'))
+  
+  plot_dict = {}
+  plot_dict['per_action_plot'] = p_per_action
+  plot_dict['per_period_plot'] = p_per_period
+  return plot_dict 
+
+##############################################################################
+# generating Fig. 10(a) of the paper, making it consistent with Fig. 10(b)
+def rename_agent(name):
+  if name=='Laplace TS':
+    return 'a'
+  elif name=='Langevin TS':
+    return 'b'
+  elif name=='TS':
+    return 'c'
+  elif name=='bootstrap TS':
+    return 'd'
+  else:
+    raise ValueError('There is an unknown agent. Perhaps you need to use other plotting functions.') 
+  
+  
+def customized_algorithm_plot(experiment_name='finite_simple_sanity', data_path=_DEFAULT_DATA_PATH):
+  """Simple plot of average instantaneous regret by agent, per timestep.
+
+  Args:
+    experiment_name: string = name of experiment config.
+    data_path: string = where to look for the files.
+
+  Returns:
+    p: ggplot plot
+  """
+  df = load_data(experiment_name, data_path)
+  plt_df = (df.groupby(['t', 'agent'])
+            .agg({'instant_regret': np.mean})
+            .reset_index())
+  plt_df['agent_new_name'] = plt_df.agent.apply(rename_agent)
+    
+  custom_labels = ['Laplace TS','Langevin TS','TS','bootstrap TS']
+  custom_colors = ["#E41A1C","#377EB8","#4DAF4A","#984EA3"]
+  
+  p = (gg.ggplot(plt_df)
+       + gg.aes('t', 'instant_regret', colour='agent_new_name')
+       + gg.geom_line(size=1.25, alpha=0.75)
+       + gg.xlab('time period (t)')
+       + gg.ylab('per-period regret')
+       + gg.scale_color_manual(name='agent', labels = custom_labels,values=custom_colors))
+  return p

@@ -3,7 +3,7 @@
 A simple experiment comparing Thompson sampling to greedy algorithm. Finite
 armed bandit with 3 arms. Greedy algorithm premature and suboptimal
 exploitation.
-See Figure 9a from https://arxiv.org/abs/1707.02038
+See Figure 10(a) from https://arxiv.org/abs/1707.02038
 """
 
 from __future__ import absolute_import
@@ -18,6 +18,7 @@ from base.experiment import BaseExperiment
 from finite_arm.agent_finite import FiniteBernoulliBanditBootstrap
 from finite_arm.agent_finite import FiniteBernoulliBanditLaplace
 from finite_arm.agent_finite import FiniteBernoulliBanditTS
+from finite_arm.agent_finite import FiniteBernoulliBanditLangevin
 from finite_arm.env_finite import FiniteArmedBernoulliBandit
 
 import numpy as np
@@ -26,10 +27,13 @@ def get_config():
   """Generates the config for the experiment."""
   name = 'finite_simple_sanity'
   n_arm = 3
+  step_size = 0.01
+  step_count = 100
   agents = collections.OrderedDict(
-      [('ts', functools.partial(FiniteBernoulliBanditTS, n_arm)),
-       ('bootstrap', functools.partial(FiniteBernoulliBanditBootstrap, n_arm)),
-       ('laplace', functools.partial(FiniteBernoulliBanditLaplace, n_arm))]
+      [('Laplace TS', functools.partial(FiniteBernoulliBanditLaplace, n_arm)),
+       ('Langevin TS', functools.partial(FiniteBernoulliBanditLangevin, n_arm,step_count,step_size),),
+       ('bootstrap TS', functools.partial(FiniteBernoulliBanditBootstrap, n_arm)),
+       ('TS', functools.partial(FiniteBernoulliBanditTS, n_arm))]
   )
   environments = collections.OrderedDict()
   n_env = 100

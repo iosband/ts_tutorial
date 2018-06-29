@@ -13,12 +13,13 @@ from __future__ import print_function
 import copy
 import numpy as np
 import numpy.linalg as npla
-import random
+import scipy.linalg as spla
 
 from collections import defaultdict
 from base.agent import Agent
 from graph.env_graph_bandit import CorrelatedBinomialBridge
 
+_SMALL_NUMBER = 1e-10
 ###############################################################################
 # Helper functions for correlated agents
 
@@ -352,3 +353,59 @@ class BootstrapCorrelatedBB(CorrelatedBBTS):
     path = self.internal_env.get_shortest_path()
 
     return path
+
+##############################################################################
+class CorrelatedBBLangevin(CorrelatedBBTS):
+  '''Correlated Binomial Bridge, Langevin Method.'''
+  def __init__(self,
+               n_stages,
+               mu0,
+               sigma0,
+               sigma_tilde,
+               step_count=200,
+               step_size=.01):
+    CorrelatedBBTS.__init__(self, n_stages, mu0, sigma0, sigma_tilde)
+    self.step_count = step_count
+    self.step_size = step_size
+    
+  def get_sample(self):
+    '''generates a sample based on the Langevin method.'''
+    mu = self.posterior[0]
+    Sigma = self.posterior[1]
+    SigmaInv = self.posterior[2]
+    dim = len(mu)
+    
+    preconditioner = Sigma
+    preconditioner_sqrt=spla.sqrtm(preconditioner)
+    #Remove any complex component in preconditioner_sqrt arising from numerical error
+    complex_part=np.imag(preconditioner)
+    if (spla.norm(complex_part)> _SMALL_NUMBER):
+        print("Warning. There may be numerical issues.  Preconditioner has complex values")
+        print("Norm of the imaginary component is, ")+str(spla.norm(complex_part))
+    preconditioner_sqrt=np.real(preconditioner_sqrt)
+    
+    x = mu
+    for i in range(self.step_count):
+      g = -SigmaInv.dot(x-mu) # posterior gradient at current point
+      scaled_grad=preconditioner.dot(g)
+      scaled_noise= preconditioner_sqrt.dot(np.random.randn(dim))
+      x = x + self.step_size*scaled_grad + np.sqrt(2*self.step_size)*scaled_noise
+      
+    # mapping and reformatting the final point to a desired sample
+    edge_length = copy.deepcopy(self.internal_env.graph)
+
+    for start_node in edge_length:
+      for end_node in edge_length[start_node]:
+        edge_length[start_node][end_node] = \
+            np.exp(x[self.edge2index[start_node][end_node]])
+
+    return edge_length
+      
+  def pick_action(self, observation):
+    """Greedy shortest path wrt Langevin sample."""
+    langevin_sample = self.get_sample()
+    self.internal_env.overwrite_edge_length(langevin_sample)
+    path = self.internal_env.get_shortest_path()
+
+    return path
+    

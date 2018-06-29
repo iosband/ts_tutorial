@@ -9,6 +9,7 @@ import numpy as np
 from base.agent import Agent
 from base.agent import random_argmax
 
+_SMALL_NUMBER = 1e-10
 ##############################################################################
 
 
@@ -122,3 +123,52 @@ class DriftingFiniteBernoulliBanditTS(FiniteBernoulliBanditTS):
         1 - self.gamma) + self.b0 * self.gamma
     self.prior_success[action] += reward
     self.prior_failure[action] += 1 - reward
+
+##############################################################################
+class FiniteBernoulliBanditLangevin(FiniteBernoulliBanditTS):
+  '''Langevin method for approximate posterior sampling.'''
+  
+  def __init__(self,n_arm, step_count=100,step_size=0.01,a0=1, b0=1, epsilon=0.0):
+    FiniteBernoulliBanditTS.__init__(self,n_arm, a0, b0, epsilon)
+    self.step_count = step_count
+    self.step_size = step_size
+  
+  def project(self,x):
+    '''projects the vector x onto [_SMALL_NUMBER,1-_SMALL_NUMBER] to prevent
+    numerical overflow.'''
+    return np.minimum(1-_SMALL_NUMBER,np.maximum(x,_SMALL_NUMBER))
+  
+  def compute_gradient(self,x):
+    grad = (self.prior_success-1)/x - (self.prior_failure-1)/(1-x)
+    return grad
+    
+  def compute_preconditioners(self,x):
+    second_derivatives = (self.prior_success-1)/(x**2) + (self.prior_failure-1)/((1-x)**2)
+    second_derivatives = np.maximum(second_derivatives,_SMALL_NUMBER)
+    preconditioner = np.diag(1/second_derivatives)
+    preconditioner_sqrt = np.diag(1/np.sqrt(second_derivatives))
+    return preconditioner,preconditioner_sqrt
+    
+  def get_posterior_sample(self):
+        
+    (a, b) = (self.prior_success + 1e-6 - 1, self.prior_failure + 1e-6 - 1)
+    # The modes are not well defined unless alpha, beta > 1
+    assert np.all(a > 0)
+    assert np.all(b > 0)
+    x_map = a / (a + b)
+    x_map = self.project(x_map)
+    
+    preconditioner, preconditioner_sqrt=self.compute_preconditioners(x_map)
+   
+    x = x_map
+    for i in range(self.step_count):
+      g = self.compute_gradient(x)
+      scaled_grad = preconditioner.dot(g)
+      scaled_noise= preconditioner_sqrt.dot(np.random.randn(self.n_arm)) 
+      x = x + self.step_size*scaled_grad + np.sqrt(2*self.step_size)*scaled_noise
+      x = self.project(x)
+      
+    return x
+      
+    
+    

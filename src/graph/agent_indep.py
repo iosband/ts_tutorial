@@ -146,3 +146,24 @@ class IndependentBBTS(IndependentBBEpsilonGreedy):
     path = self.internal_env.get_shortest_path()
 
     return path
+  
+###############################################################################
+class IndependentBBMultipleTS(IndependentBBTS):
+  '''Concurrent TS agents.'''
+  
+  def __init__(self, n_stages, mu0, sigma0, sigma_tilde,num_agents=10):
+    IndependentBBTS.__init__(self,n_stages, mu0, sigma0, sigma_tilde,0.0)
+    self.num_agents = num_agents
+    
+  def update_observation(self, observation, action, rewards):
+    assert(len(rewards) == self.num_agents)
+    
+    for reward in rewards:
+      IndependentBBTS.update_observation(self, observation, action, reward)
+    
+  def pick_action(self, observation):
+    """Picks TS action for all the agents independently."""
+    paths = [IndependentBBTS.pick_action(self, observation) for x in 
+             range(self.num_agents)]
+    return paths
+    

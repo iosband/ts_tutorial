@@ -1,7 +1,7 @@
 """Specify the jobs to run via config file.
 
 Binomial bridge bandit experiment with correlated edges.
-See Figure 7 https://arxiv.org/pdf/1707.02038.pdf
+See Figure 8 https://arxiv.org/pdf/1707.02038.pdf
 """
 
 from __future__ import absolute_import
@@ -13,7 +13,6 @@ import functools
 
 from base.config_lib import Config
 from base.experiment import ExperimentNoAction
-from graph.agent_correlated import BootstrapCorrelatedBB
 from graph.agent_correlated import CorrelatedBBTS
 from graph.agent_indep import IndependentBBTS
 from graph.env_graph_bandit import CorrelatedBinomialBridge
@@ -28,14 +27,11 @@ def get_config():
   sigma_tilde = 1
 
   agents = collections.OrderedDict(
-      [('thoughtful',
+      [('coherent TS',
         functools.partial(CorrelatedBBTS,
                           n_stages, mu0, sigma0, sigma_tilde)),
-       ('misspecified_ts',
+       ('misspecified TS',
         functools.partial(IndependentBBTS,
-                          n_stages, mu0, sigma0, sigma_tilde)),
-       ('bootstrap',
-        functools.partial(BootstrapCorrelatedBB,
                           n_stages, mu0, sigma0, sigma_tilde))]
   )
 

@@ -180,3 +180,46 @@ class DebugExperiment(BaseExperiment):
                         'cum_regret': self.cum_regret,
                         'unique_id': self.unique_id}
       self.results.append(self.data_dict)
+
+##############################################################################
+class ExperimentMultipleAgents(BaseExperiment):
+ 
+  def run_step_maybe_log(self, t):
+
+    observation = self.environment.get_observation()
+    actions = self.agent.pick_action(observation)
+   
+    # Compute useful stuff for regret calculations
+    optimal_reward = self.environment.get_optimal_reward()
+    expected_rewards = self.environment.get_expected_reward(actions)
+    rewards = self.environment.get_stochastic_reward(actions)
+
+    # Update the agent using realized rewards + bandit learing
+    self.agent.update_observation(observation, actions, rewards)
+
+    # Log whatever we need for the plots we will want to use.
+    instant_regrets = optimal_reward - expected_rewards
+    self.cum_regrets += instant_regrets
+
+    # Advance the environment (used in nonstationary experiment)
+    self.environment.advance(actions, rewards)
+
+    if (t + 1) % self.rec_freq == 0:
+      for i in range(len(actions)):
+        self.data_dict = {'t': (t + 1),
+                          'agent_id': (i+1),
+                          'action_id': (t*self.agent.num_agents + i+1),
+                          'instant_regret': instant_regrets[i],
+                          'cum_regret': self.cum_regrets[i],
+                          'unique_id': self.unique_id}
+        self.results.append(self.data_dict)
+    
+  def run_experiment(self):
+    """Run the experiment for n_steps and collect data."""
+    #np.random.seed(self.seed)
+    self.cum_regrets = np.zeros(self.agent.num_agents)
+
+    for t in range(self.n_steps):
+      self.run_step_maybe_log(t)
+
+    self.results = pd.DataFrame(self.results)

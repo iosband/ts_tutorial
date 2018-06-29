@@ -225,7 +225,7 @@ if __name__ == '__main__':
   assert os.path.isdir(args.data_path), data_err
 
   plot_err = (plot_help
-              + '\n\tYour input data_path={}, please try again.'
+              + '\n\tYour input plot_path={}, please try again.'
               .format(args.plot_path))
   assert os.path.isdir(args.plot_path), plot_err
 
