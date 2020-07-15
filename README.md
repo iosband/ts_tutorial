@@ -7,8 +7,6 @@ This is a git repository to release and share the code from our paper [A Tutoria
 
 All of the figures and results contained in the paper are generated through running the code contained in this repository.
 
-Note that as of 29th June 2018 the version of this paper posted to arXiv is out of date, we are working to address this issue.
-Please contact the authors if you have any trouble/questions.
 
 ## Installation
 
