@@ -7,6 +7,15 @@ This is a git repository to release and share the code from our paper [A Tutoria
 
 All of the figures and results contained in the paper are generated through running the code contained in this repository.
 
+## Getting started with colab
+
+If you are new to the code, the easiest way to get started is by checking out the introductory [notebook](https://github.com/iosband/ts_tutorial/blob/master/ts_tutorial_intro.ipynb).
+
+This provides an example of how to use our library code, and the commands to reproduce the figures from the paper.
+
+If you press "[open in colab](https://colab.sandbox.google.com/github/iosband/ts_tutorial/blob/master/ts_tutorial_intro.ipynb)" you will have the opportunity to run this python code direct in your browser (for free) without needing to install anything.
+This can be a great way to play around with code before you decide to move anything to your own machine.
+
 
 ## Installation
 
@@ -44,7 +53,7 @@ cd ts_tutorial/src
 python reproduce_figures.py --help
 
 # Reproduces Figure 3 with 1% of the seeds of the paper, save output to /tmp/
-python reproduce_figures.py --figure=3 --run_frac=0.01 --data_path=/tmp/ --plot_path=/tmp/
+python reproduce_figures.py --figure=3.1 --run_frac=0.01 --data_path=/tmp/ --plot_path=/tmp/
 ```
 
 Reproducing the number of experiments and seeds used in the paper can be extremely computationally expensive.

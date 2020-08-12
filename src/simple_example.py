@@ -20,15 +20,17 @@ sys.path.append(os.getcwd())
 ##############################################################################
 # Running a single experiment
 
-n_arm = 3
 probs = [0.7, 0.8, 0.9]
 n_steps = 1000
 seed = 0
 
-agent = FiniteBernoulliBanditTS(n_arm)
+agent = FiniteBernoulliBanditTS(n_arm=len(probs))
 env = FiniteArmedBernoulliBandit(probs)
-experiment = BaseExperiment(agent, env, n_steps=1000,
-                            seed=seed, unique_id='example')
+experiment = BaseExperiment(
+    agent, env, n_steps=n_steps, seed=seed, unique_id='example')
+
+experiment.run_experiment()
+
 
 experiment.run_experiment()
 
