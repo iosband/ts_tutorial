@@ -1,10 +1,4 @@
-"""Script interface to reproduce figures from https://arxiv.org/abs/1707.02038
-
-
-"""
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+"""Script interface to reproduce figures from https://arxiv.org/abs/1707.02038. """
 
 import argparse
 import importlib
@@ -32,54 +26,78 @@ FigureOptions = collections.namedtuple(
     'FigureOptions', ['fig_name', 'config','paper_n_jobs', 'plot_fun'])
 
 FIGURE_OPTIONS = collections.OrderedDict([
-    ['3', FigureOptions(fig_name='3',
-                        config='finite_arm.config_simple',
-                        paper_n_jobs=20000,
-                        plot_fun=bp.compare_action_selection_plot)],
-    ['4a', FigureOptions(fig_name='4a',
-                         config='finite_arm.config_simple',
-                         paper_n_jobs=20000,
-                         plot_fun=bp.simple_algorithm_plot)],
-    ['4b', FigureOptions(fig_name='4b',
-                         config='finite_arm.config_simple_rand',
-                         paper_n_jobs=20000,
-                         plot_fun=bp.simple_algorithm_plot)],
-    ['6', FigureOptions(fig_name='6',
-                        config='graph.config_indep',
-                        paper_n_jobs=5000,
-                        plot_fun=bp.cumulative_travel_time_plot)],
-    ['7', FigureOptions(fig_name='7',
-                        config='graph.config_correlated',
-                        paper_n_jobs=3000,
-                        plot_fun=bp.cumulative_travel_time_plot)],
-    ['8', FigureOptions(fig_name='8',
-                        config='graph.config_indep_binary',
-                        paper_n_jobs=2000,
-                        plot_fun=bp.simple_algorithm_plot)],
-    ['9a', FigureOptions(fig_name='9a',
-                         config='finite_arm.config_simple_sanity',
-                         paper_n_jobs=30000,
-                         plot_fun=bp.simple_algorithm_plot)],
-    ['9b', FigureOptions(fig_name='9b',
-                         config='graph.config_correlated_sanity',
-                         paper_n_jobs=3000,
-                         plot_fun=bp.simple_algorithm_plot)],
-    ['11', FigureOptions(fig_name='11',
-                         config='finite_arm.config_misspecified',
-                         paper_n_jobs=20000,
-                         plot_fun=bp.misspecified_plot)],
-    ['12', FigureOptions(fig_name='12',
-                         config='finite_arm.config_drift',
-                         paper_n_jobs=20000,
-                         plot_fun=bp.simple_algorithm_plot)],
-    ['13', FigureOptions(fig_name='13',
-                         config='pricing.config_pricing',
-                         paper_n_jobs=2000,
-                         plot_fun=bp.simple_algorithm_plot)],
-    ['17', FigureOptions(fig_name='17',
-                         config='ensemble_nn.config_nn',
-                         paper_n_jobs=20000,
-                         plot_fun=bp.ensemble_plot)],
+    ['3.1', FigureOptions(fig_name='3.1',
+                          config='finite_arm.config_simple',
+                          paper_n_jobs=20000,
+                          plot_fun=bp.compare_action_selection_plot)],
+    ['3.2a', FigureOptions(fig_name='3.2a',
+                           config='finite_arm.config_simple',
+                           paper_n_jobs=20000,
+                           plot_fun=bp.simple_algorithm_plot)],
+    ['3.2b', FigureOptions(fig_name='3.2b',
+                           config='finite_ arm.config_simple_rand',
+                           paper_n_jobs=20000,
+                           plot_fun=bp.simple_algorithm_plot)],
+    ['4.1a', FigureOptions(fig_name='4.1a',
+                           config='graph.config_indep',
+                           paper_n_jobs=5000,
+                           plot_fun=bp.simple_algorithm_plot)],
+    ['4.1b', FigureOptions(fig_name='4.1b',
+                           config='graph.config_indep',
+                           paper_n_jobs=5000,
+                           plot_fun=bp.cumulative_travel_time_plot)],
+    ['4.3a', FigureOptions(fig_name='4.3a',
+                           config='graph.config_correlated',
+                           paper_n_jobs=3000,
+                           plot_fun=bp.simple_algorithm_plot)],
+    ['4.3b', FigureOptions(fig_name='4.3b',
+                           config='graph.config_correlated',
+                           paper_n_jobs=3000,
+                           plot_fun=bp.cumulative_travel_time_plot)],
+    ['5.1', FigureOptions(fig_name='5.1',
+                          config='graph.config_indep_binary',
+                          paper_n_jobs=2000,
+                          plot_fun=bp.simple_algorithm_plot)],
+    ['5.2a', FigureOptions(fig_name='5.2a',
+                           config='finite_arm.config_simple_sanity',
+                           paper_n_jobs=30000,
+                           plot_fun=bp.simple_algorithm_plot)],
+    ['5.2b', FigureOptions(fig_name='5.2b',
+                           config='graph.config_correlated_sanity',
+                           paper_n_jobs=3000,
+                           plot_fun=bp.simple_algorithm_plot)],
+    ['6.2', FigureOptions(fig_name='6.2',
+                          config='finite_arm.config_misspecified',
+                          paper_n_jobs=20000,
+                          plot_fun=bp.misspecified_plot)],
+    ['6.3', FigureOptions(fig_name='6.3',
+                          config='finite_arm.config_drift',
+                          paper_n_jobs=20000,
+                          plot_fun=bp.simple_algorithm_plot)],
+    ['6.4', FigureOptions(fig_name='6.4',
+                          config='graph.config_indep_concurrent',
+                          paper_n_jobs=1000,
+                          plot_fun=bp.concurrent_agents_plot)],
+    ['7.1', FigureOptions(fig_name='7.1',
+                          config='news_recommendation.config_news_recommendation',
+                          paper_n_jobs=10000,
+                          plot_fun=bp.simple_algorithm_plot)],
+    ['7.2', FigureOptions(fig_name='7.2',
+                          config='assortment.config_assortment',
+                          paper_n_jobs=20000,
+                          plot_fun=bp.simple_algorithm_plot)],
+    ['7.3', FigureOptions(fig_name='7.3',   
+                          config='cascading.config_cascading_large',
+                          paper_n_jobs=1000,
+                          plot_fun=bp.simple_algorithm_plot)],
+    ['7.4', FigureOptions(fig_name='7.4',
+                          config='cascading.config_cascading_small',
+                          paper_n_jobs=1000,
+                          plot_fun=bp.simple_algorithm_plot)],
+    ['7.5', FigureOptions(fig_name='7.5',
+                          config='ensemble_nn.config_nn',
+                          paper_n_jobs=20000,
+                          plot_fun=bp.ensemble_plot)],
 ])
 
 
@@ -138,7 +156,7 @@ def _save_plot_to_file(plot_dict, plot_path, run_frac=None):
   Returns:
     NULL, plot is written to file_path as a png file.
   """
-  for plot_name, p in plot_dict.iteritems():
+  for plot_name, p in plot_dict.items():
     file_path = os.path.join(plot_path, plot_name.lower() + '.png')
     file_path = file_path.replace(' ', '_')
     print('*' * 80)
@@ -173,7 +191,7 @@ def reproduce_figure(figure_options, run_frac, data_path, plot_path):
   # Running the jobs via command line (this can/should be parallelized)
   for i in range(n_jobs):
     print('Starting job {} out of {}'.format(i, n_jobs))
-    os.system('ipython batch_runner.py --config {} --job_id {} --save_path {}'
+    os.system('python batch_runner.py --config={} --job_id={} --save_path={}'
               .format(figure_options.config, i, data_path))
 
   # Plotting output
@@ -197,47 +215,42 @@ if __name__ == '__main__':
   # Parsing command line options
   parser = argparse.ArgumentParser(description='Reproduce figures.')
   fig_help = ('Figures to reproduce. Must be one of the following options:\n'
-              '{}'.format(FIGURE_OPTIONS.keys() + ['all']))
+              '{}'.format(list(FIGURE_OPTIONS.keys()) + ['all']))
   parser.add_argument('--figure', help=fig_help, type=str, default='3')
   run_help = 'Proportion of paper experiments to run. Must be in [0, 1].'
-  parser.add_argument('--run_frac', help=run_help, type=float, default=0.01)
+  parser.add_argument('--run_frac', help=run_help, type=float, default=0.0001)
   data_help = 'Path to store intermediate .csv files of experiment results. Must exist in OS.'
   parser.add_argument('--data_path', help=data_help, type=str, default='/tmp/')
   plot_help = 'Path to store output paper plots. Must exist in OS.'
   parser.add_argument('--plot_path', help=plot_help, type=str, default='/tmp/')
-  args = parser.parse_args()
+  settings = parser.parse_args()
 
   # Checking valid command line options
   run_frac_err = (run_help
                   + '\n\tYour input run_frac={}, please try again.'
-                  .format(args.run_frac))
-  assert args.run_frac >= 0., run_frac_err
-  assert args.run_frac <= 1., run_frac_err
+                  .format(settings.run_frac))
+  assert settings.run_frac >= 0., run_frac_err
+  assert settings.run_frac <= 1., run_frac_err
 
   figure_err = (fig_help
                 + '\n\tYour input figure={}, please try again.'
-                .format(args.figure))
-  assert args.figure in set(FIGURE_OPTIONS.keys() + ['all']), figure_err
+                .format(settings.figure))
+  assert settings.figure in set(list(FIGURE_OPTIONS.keys()) + ['all']), figure_err
 
   dat_err =  (data_help
               + '\n\tYour input data_path={}, please try again.'
-              .format(args.data_path))
-  assert os.path.isdir(args.data_path), data_err
+              .format(settings.data_path))
+  assert os.path.isdir(settings.data_path), data_err
 
   plot_err = (plot_help
               + '\n\tYour input plot_path={}, please try again.'
-              .format(args.plot_path))
-  assert os.path.isdir(args.plot_path), plot_err
+              .format(settings.plot_path))
+  assert os.path.isdir(settings.plot_path), plot_err
 
   # Logging to screen
   print('*' * 80)
-  print('Parsing command line fig={}, run_frac={}, data_path={}, save_path={}'
-        .format(args.figure, args.run_frac, args.data_path, args.plot_path))
+  print(f'Parsing {settings}')
   print('WARNING - this can take a long time on a single machine... you may want to parallelize the jobs.\n')
 
   # Running jobs
-  main(args.figure, args.run_frac, args.data_path, args.plot_path)
-
-
-
-
+  main(settings.figure, settings.run_frac, settings.data_path, settings.plot_path)

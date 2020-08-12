@@ -12,10 +12,6 @@ run very large experiment sweeps without slowdown/memory bottlenecks.
 For usage please see `batch_runner.py`.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
 import pandas as pd
 
@@ -40,9 +36,9 @@ def iterate_through_config(config_in):
   """
   unique_id = 0
   for seed in range(config_in.n_seeds):
-    for env_name, env_constructor in config_in.environments.iteritems():
-      for agent_name, agent_constructor in config_in.agents.iteritems():
-        for _, exp_constructor in config_in.experiments.iteritems():
+    for env_name, env_constructor in config_in.environments.items():
+      for agent_name, agent_constructor in config_in.agents.items():
+        for _, exp_constructor in config_in.experiments.items():
           info = {'experiment_name': config_in.name,
                   'unique_id': unique_id,
                   'seed': seed,

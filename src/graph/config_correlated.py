@@ -4,10 +4,6 @@ Binomial bridge bandit experiment with correlated edges.
 See Figure 8 https://arxiv.org/pdf/1707.02038.pdf
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
 import functools
 

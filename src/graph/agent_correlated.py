@@ -6,10 +6,6 @@ it up into three separate sections for:
 - Correlated Binomial Bridge
 - Independent Binomial Bridge with Binary Reward
 """
-
-from __future__ import division
-from __future__ import print_function
-
 import copy
 import numpy as np
 import numpy.linalg as npla

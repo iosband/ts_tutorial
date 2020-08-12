@@ -1,8 +1,4 @@
 """Agents for news recommendation problem."""
-
-from __future__ import division
-from __future__ import print_function
-
 import numpy as np
 import numpy.linalg as npla
 import scipy.linalg as spla

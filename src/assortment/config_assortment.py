@@ -1,12 +1,7 @@
 """Specify the jobs to run via config file.
 
-Dynamic pricing experiment.
+Product assortment exeperiment (Figure 7.2).
 """
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
 import functools
 import numpy as np

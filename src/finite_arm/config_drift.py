@@ -6,10 +6,6 @@ Thompson sampling without forgetting factor in a nonstationary environment.
 See Figure 12 https://arxiv.org/pdf/1707.02038.pdf
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
 import functools
 

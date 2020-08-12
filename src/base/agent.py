@@ -2,10 +2,6 @@
 
 All agents should inherit from the Agent class and work from there.
 """
-
-from __future__ import division
-from __future__ import print_function
-
 import numpy as np
 
 

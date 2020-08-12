@@ -4,11 +4,6 @@ This file is presented as a very simple entry point to code.
 For running any meaningful experiments, we suggest `batch_runner.py` or
 `local_runner.py`.
 """
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import os
 import sys
 

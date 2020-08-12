@@ -6,10 +6,6 @@ in a simple domain where we *can* sample the true posterior.
 See Figure 10(b) https://arxiv.org/pdf/1707.02038.pdf
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
 import functools
 

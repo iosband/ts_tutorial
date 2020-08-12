@@ -7,10 +7,6 @@ files of the results saved in `_DATA_FILEPATH`.
 All plots are saved to `_PLOT_FILEPATH`.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import os
 import sys
 
@@ -54,7 +50,7 @@ plot_dict.update(bp.ensemble_plot())
 
 # Saving all plots to file
 
-for plot_name, p in plot_dict.iteritems():
+for plot_name, p in plot_dict.items():
   file_path = os.path.join(_PLOT_FILEPATH, plot_name.lower() + '.png')
   file_path = file_path.replace(' ', '_')
   if 'ensemble' in file_path:

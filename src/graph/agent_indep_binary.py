@@ -6,10 +6,6 @@ it up into three separate sections for:
 - Correlated Binomial Bridge
 - Independent Binomial Bridge with Binary Reward
 """
-
-from __future__ import division
-from __future__ import print_function
-
 import copy
 import numpy as np
 import numpy.linalg as npla
@@ -438,12 +434,7 @@ class EpsilonGreedyIndependentBBWithBinaryReward(
       path = self.internal_env.get_shortest_path()
       return path
 
-
-
-##############################################################################
-
-
-
+##############################################################################class LangevinMCMCIndependentBBWithBinaryReward(
 class LangevinMCMCIndependentBBWithBinaryReward(
     LaplaceIndependentBBWithBinaryReward):
   """Langevin MCMC method on Binomial Bridges with binary feedback for each path."""
@@ -622,7 +613,6 @@ class StochasticLangevinMCMCIndependentBBWithBinaryReward(
 
 
 
-"""Class that was used in testing gradient methods while developing the Langevin MCMC method"""
 #class GradientAscentTester(
 #    LangevinMCMCIndependentBBWithBinaryReward):
 #  """A class that helps evaluate the convergence of gradient ascent based optimizers.
@@ -782,6 +772,3 @@ class StochasticLangevinMCMCIndependentBBWithBinaryReward(
 #        edge_length[start_node][end_node] = flattened_sample[edge_index]
 #
 #    return edge_length
-
-
-

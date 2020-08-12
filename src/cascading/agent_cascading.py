@@ -1,9 +1,5 @@
 """Agents for cascading bandit problems.
 """
-
-from __future__ import division
-from __future__ import print_function
-
 import numpy as np
 
 from base.agent import Agent
@@ -13,14 +9,16 @@ from base.agent import Agent
 
 class CascadingBanditEpsilonGreedy(Agent):
 
-  def __init__(self, num_items, num_positions, a0=1, b0=1, epsilon=0.0):
+  def __init__(self, num_items, num_positions, a0=1, b0=1, epsilon=0.0, optimism=1.0):
     """An agent for cascading bandits.
 
     Args:
       num_items - "L" in math notation
       num_positions - "K" in math notation
       a0 - prior success
-      b0
+      b0 - prior failure
+      epsilon - used in epsilon exploration
+      optimism - used in UCB1 to adjust the degree of optimism
     """
     self.num_items = num_items
     self.num_positions = num_positions
@@ -30,6 +28,7 @@ class CascadingBanditEpsilonGreedy(Agent):
     self.prior_failure = np.array([b0 for item in range(num_items)])
     self.epsilon = epsilon
     self.timestep = 1
+    self.optimism = optimism
 
   def set_prior(self, prior_success, prior_failure):
     # Overwrite the default prior
@@ -72,16 +71,17 @@ class CascadingBanditEpsilonGreedy(Agent):
 ##############################################################################
 
 
-def _ucb_1(empirical_mean, timestep, count):
+def _ucb_1(empirical_mean, timestep, count, optimism = 1.0):
   """Computes UCB1 upper confidence bound.
 
   Args:
     empirical_mean - empirical mean
     timestep - time elapsed
     count - number of visits to that object
+    optimism - degree of optimism to adjust the confidence
   """
   confidence = np.sqrt((1.5 * np.log(timestep)) / count)
-  return empirical_mean + confidence
+  return empirical_mean + optimism * confidence
 
 
 class CascadingBanditUCB1(CascadingBanditEpsilonGreedy):
@@ -91,7 +91,7 @@ class CascadingBanditUCB1(CascadingBanditEpsilonGreedy):
     ucb_values = np.zeros(self.num_items)
     for item in range(self.num_items):
       count = self.prior_success[item] + self.prior_failure[item]
-      ucb_values[item] = _ucb_1(posterior_means[item], self.timestep, count)
+      ucb_values[item] = _ucb_1(posterior_means[item], self.timestep, count, self.optimism)
 
     action_list = ucb_values.argsort()[::-1][:self.num_positions]
     return action_list

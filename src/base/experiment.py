@@ -4,10 +4,6 @@ We end up with several experiment variants since we might want to log different
 elements of the agent/environment interaction. At the end of `run_experiment` we
 save the key results for plotting in a pandas dataframe `experiment.results`.
 """
-
-from __future__ import division
-from __future__ import print_function
-
 import numpy as np
 import pandas as pd
 

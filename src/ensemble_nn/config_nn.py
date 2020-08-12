@@ -7,10 +7,6 @@ epsilon and annealing epsilon), dropout (arXiv:1506.02142), and ensemble
 sampling.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
 import functools
 

@@ -7,15 +7,11 @@ We implement three main types of agent:
 
 All code is specialized to the setting of 2-layer fully connected MLPs.
 """
-
-from __future__ import division
-from __future__ import print_function
-
 import numpy as np
 import numpy.random as rd
 
 from base.agent import Agent
-from env_nn import TwoLayerNNBandit
+from ensemble_nn.env_nn import TwoLayerNNBandit
 
 
 class TwoLayerNNEpsilonGreedy(Agent):

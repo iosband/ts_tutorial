@@ -6,10 +6,6 @@ exploitation.
 See Figure 3 from https://arxiv.org/abs/1707.02038
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
 import functools
 

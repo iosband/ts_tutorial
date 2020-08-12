@@ -16,11 +16,6 @@ This is much simpler and fine for small sweeps, but is not scalable to large
 parallel evaluations.
 
 """
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import importlib
 import os
 import sys
@@ -42,8 +37,7 @@ LIST_OF_VALID_CONFIGS = ['finite_arm.config_simple',
                          'graph.config_indep',
                          'graph.config_indep_binary',
                          'graph.config_correlated',
-                         'graph.config_correlated_sanity',
-                         'pricing.config_pricing']
+                         'graph.config_correlated_sanity']
 
 CONFIG_PATH = 'finite_arm.config_simple'
 N_JOBS = 100
@@ -84,6 +78,3 @@ p = (gg.ggplot(plt_df)
      + gg.aes('t', 'instant_regret', colour='agent')
      + gg.geom_line())
 print(p)
-
-
-

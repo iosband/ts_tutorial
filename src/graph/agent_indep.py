@@ -6,10 +6,6 @@ it up into three separate sections for:
 - Correlated Binomial Bridge
 - Independent Binomial Bridge with Binary Reward
 """
-
-from __future__ import division
-from __future__ import print_function
-
 import copy
 import numpy as np
 import numpy.linalg as npla
@@ -117,7 +113,7 @@ class IndependentBBEpsilonGreedy(Agent):
       path += [start_node]
       if start_node == (self.n_stages, 0):
         break
-      start_node = random.choice(self.posterior[start_node].keys())
+      start_node = random.choice(list(self.posterior[start_node].keys()))
     return path
 
   def pick_action(self, observation):

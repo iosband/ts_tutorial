@@ -1,8 +1,4 @@
-"""dynamic pricing bandit environments."""
-
-from __future__ import division
-from __future__ import print_function
-
+"""Product assortment environments."""
 import itertools
 import numpy as np
 

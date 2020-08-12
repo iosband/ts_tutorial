@@ -5,10 +5,6 @@ Compare the performance of Thompson sampling with different egreedy.
 See Figure 7 https://arxiv.org/pdf/1707.02038.pdf
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
 import functools
 

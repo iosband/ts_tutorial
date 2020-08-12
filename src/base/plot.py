@@ -7,10 +7,6 @@ Some of this code is generic, but a lot of it is designed specifically to
 generate the plots that are used in the TS tutorial paper. For usage in
 generating these plots see `batch_analysis.py`.
 """
-
-from __future__ import division
-from __future__ import print_function
-
 import os
 import sys
 
@@ -39,9 +35,10 @@ def _name_cleaner(agent_name):
                  'kl_ucb': 'KL UCB',
                  'misspecified_ts': 'Misspecified TS',
                  'ucb1': 'UCB1',
+                 'ucb-best': 'UCB-best',
                  'nonstationary_ts': 'Nonstationary TS',
                  'stationary_ts': 'Stationary TS',
-                 'greedy': 'Greedy',
+                 'greedy': 'greedy',
                  'ts': 'TS',
                  'action_0': 'Action 0',
                  'action_1': 'Action 1',

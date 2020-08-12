@@ -60,7 +60,7 @@ class priorityDictionary(dict):
         dict.__setitem__(self, key, val)
         heap = self.__heap
         if len(heap) > 2 * len(self):
-            self.__heap = [(v, k) for k, v in self.iteritems()]
+            self.__heap = [(v, k) for k, v in self.items()]
             self.__heap.sort()
             # builtin sort probably faster than O(n)-time heapify
         else:
@@ -143,8 +143,7 @@ def Dijkstra(G,start,end=None):
       vwLength = D[v] + G[v][w]
       if w in D:
         if vwLength < D[w]:
-          raise ValueError, \
-  "Dijkstra: found better path to already-final vertex"
+          raise ValueError("Dijkstra: found better path to already-final vertex")
       elif w not in Q or vwLength < Q[w]:
         Q[w] = vwLength
         P[w] = v

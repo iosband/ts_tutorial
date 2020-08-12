@@ -34,12 +34,6 @@ Valid (config, n_jobs) for reproducing the TS tutorial paper:
  - (pricing.config_pricing, 2000)
 
 """
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
-
 import argparse
 import importlib
 import os
@@ -58,28 +52,28 @@ if __name__ == '__main__':
   parser.add_argument('--config', help='config', type=str)
   parser.add_argument('--job_id', help='job_id', type=int)
   parser.add_argument('--save_path', help='save_path', type=str)
-  args = parser.parse_args()
+  settings = parser.parse_args()
 
   # Loading in the experiment config.
-  experiment_config = importlib.import_module(args.config)
+  experiment_config = importlib.import_module(settings.config)
   config = experiment_config.get_config()
 
   # Running the experiment.
-  job_config = config_lib.get_job_config(config, args.job_id)
+  job_config = config_lib.get_job_config(config, settings.job_id)
   experiment = job_config['experiment']
   experiment.run_experiment()
 
   # Saving results to csv.
   file_name = ('exp=' + config.name
-               + '|id=' + str(args.job_id) + '.csv')
-  file_path = os.path.join(args.save_path, file_name)
+               + '|id=' + str(settings.job_id) + '.csv')
+  file_path = os.path.join(settings.save_path, file_name)
   with open(file_path, 'w') as f:
     experiment.results.to_csv(f, index=False)
 
   # Save the parameters if it is the first job.
-  if args.job_id == 0:
+  if settings.job_id == 0:
     params_df = config_lib.get_params_df(config)
     file_name = 'exp=' + config.name + '|params.csv'
-    file_path = os.path.join(args.save_path, file_name)
+    file_path = os.path.join(settings.save_path, file_name)
     with open(file_path, 'w') as f:
       params_df.to_csv(f, index=False)

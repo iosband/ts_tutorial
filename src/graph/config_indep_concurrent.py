@@ -5,10 +5,6 @@ Evaluates the performance of concurrent Thompson sampling with multiple agents.
 See Figure 14 https://arxiv.org/pdf/1707.02038.pdf
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
 import functools
 

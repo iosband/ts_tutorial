@@ -4,11 +4,6 @@ Binomial bridge bandit experiment with independent segments.
 Compare the performance of Thompson sampling with different egreedy.
 See Figure 6 https://arxiv.org/pdf/1707.02038.pdf
 """
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import collections
 import functools
 
@@ -24,25 +19,34 @@ from cascading.env_cascading import CascadingBandit
 def get_config():
   """Generates the config for the experiment."""
   name = 'cascade'
-  num_items = 50
-  num_positions = 10
+  num_items = 1000
+  num_positions = 100
   true_a0 = 1
-  true_b0 = 10
+  true_b0 = 40
+  best_optimism = 0.05
 
-  def _correct_ts_init(num_items, num_positions):
+  def _ts_init(num_items, num_positions):
     agent = CascadingBanditTS(
         num_items, num_positions, a0=true_a0, b0=true_b0)
     return agent
 
+  def _ucb1_init(num_items, num_positions):
+    agent = CascadingBanditUCB1(
+        num_items, num_positions, a0=true_a0, b0=true_b0, optimism=1)
+    return agent
+
+  def _ucb_best_init(num_items, num_positions):
+    agent = CascadingBanditUCB1(
+        num_items, num_positions, a0=true_a0, b0=true_b0, optimism=best_optimism)
+    return agent
+
   agents = collections.OrderedDict(
-      [('correct_ts',
-        functools.partial(_correct_ts_init, num_items, num_positions)),
-       ('misspecified_ts',
-        functools.partial(CascadingBanditTS, num_items, num_positions)),
+      [('ts',
+        functools.partial(_ts_init, num_items, num_positions)),
        ('ucb1',
-        functools.partial(CascadingBanditUCB1, num_items, num_positions)),
-       ('kl_ucb',
-        functools.partial(CascadingBanditKLUCB, num_items, num_positions))]
+        functools.partial(_ucb1_init, num_items, num_positions)),
+       ('ucb-best',
+        functools.partial(_ucb_best_init, num_items, num_positions))]
   )
 
   environments = collections.OrderedDict(
@@ -56,7 +60,7 @@ def get_config():
       [(name,
         functools.partial(ExperimentNoAction, rec_freq=10))]
   )
-  n_steps = 5000
-  n_seeds = 10000
+  n_steps = 20000
+  n_seeds = 1000
   config = Config(name, agents, environments, experiments, n_steps, n_seeds)
   return config
