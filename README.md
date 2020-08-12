@@ -10,7 +10,6 @@ All of the figures and results contained in the paper are generated through runn
 ## Getting started with colab
 
 If you are new to the code, the easiest way to get started is by checking out the introductory [notebook](https://github.com/iosband/ts_tutorial/blob/master/ts_tutorial_intro.ipynb).
-
 This provides an example of how to use our library code, and the commands to reproduce the figures from the paper.
 
 If you press "[open in colab](https://colab.sandbox.google.com/github/iosband/ts_tutorial/blob/master/ts_tutorial_intro.ipynb)" you will have the opportunity to run this python code direct in your browser (for free) without needing to install anything.
